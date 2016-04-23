@@ -1,0 +1,6 @@
+www/admin/.*
+www/print/.*
+www/print/upload/
+src/admin/config.go
+src/print/config.go
+

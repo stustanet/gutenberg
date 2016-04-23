@@ -1,0 +1,403 @@
+body, html {
+	margin: 0;
+	height: 100%;
+	width: 100%;
+	font-family: "Segoe UI", Tahoma, Helvetica, freesans, sans-serif;
+	background-color: #FFF;	
+}
+
+#container {
+	min-height: 100%;
+	margin-bottom: -52px;
+}
+
+#container:after {
+	content: "";
+	display: block;
+	height: 70px;
+}
+
+header h1, section, footer {
+	margin: 0 auto;
+	width: 600px;
+}
+
+header {
+	height: 50px;
+	background: #EEE;
+}
+
+header a {
+	color: #666;
+	text-decoration: none !important; 
+}
+
+header a:hover h1, header a:active h1 {
+	color: #000;
+}
+
+header img {
+	height: 26px;
+	float: left;
+	margin-right: 60px;
+	border: 0 !important;
+}
+
+header h1 {
+	padding: 12px;
+	font-size: 26px;
+	font-weight: 600;
+	line-height: 1.0;
+}
+
+aside {
+	margin: 20px 0 30px;
+	background: #F5F5F5;
+}
+
+aside h2, aside h3 {
+	color: #333;
+	font-size: 1em;
+}
+
+aside p, aside h2 {
+	padding: 5px 10px;
+	margin: 0;
+}
+
+fieldset, #progress {
+	border: 1px #C1C3C5 solid;
+}
+
+fieldset {
+	margin: 15px 0;
+}
+
+legend {
+	font-weight: bold;
+	color: #333;
+}
+
+.info {
+	padding-left: 5px;
+}
+
+.info a {
+	font-size: 14px;
+	font-weight: normal;
+	text-decoration: underline;
+	text-decoration-style: dotted;
+}
+
+.info a:before {
+	content: "\00BB  ";
+}
+
+#file {
+	display: none;
+	margin: 25px 0 15px;
+}
+
+#filedrop {
+	padding: 30px;
+	margin: 25px 20px 15px;
+	color: #C1C3C5;
+	border: dashed 3px #C1C3C5;
+	text-align: center;
+	cursor: pointer;
+	width: 470px;
+	overflow: hidden;
+}
+
+#filedrop.hover {
+	color: #000;
+	border: solid 2px #000;
+	box-shadow: inset 0 3px 4px #888;
+}
+
+#filedrop #fileinfo {
+	display: none;
+}
+
+#filedrop p {
+	background: url("/assets/img/drop.png") no-repeat top center;
+	padding-top: 64px;
+	color: #B1B3B7;
+	font-size: 26px;
+	font-weight: 600;
+	margin: 0 0 20px;
+}
+
+#filedrop label {
+	display: block;
+}
+
+#filedrop.selected {
+	text-align: left;
+}
+
+#filedrop.selected p, #filedrop.selected label {
+	display: none;
+}
+
+#filedrop.selected #fileinfo {
+	display: block;
+	background: url("/assets/img/pdf.png") no-repeat top left;
+	padding-left: 128px;
+	height: 120px;
+}
+
+#fileinfo strong:first-child {
+	color: #333;
+}
+
+#filedrop input {
+	width: 180px;
+	border: none;
+}
+
+#filedrop.selected input {
+	width: 500px;
+}
+
+table {
+	border: 0;
+	text-align: left;
+}
+
+table th {
+	font-weight: normal;
+	padding-right: 10px;
+	vertical-align: top;
+	width: 120px;
+}
+
+#settings input {
+	margin-left: 0;
+	margin-right: 10px;
+}
+
+#settings input[type=number] {
+	text-align: right;
+	width: 40px;
+}
+
+.no-js #file {
+	display: block;
+}
+
+.no-js #filedrop {
+	display: none;
+}
+
+.step1 #step2, .step1 #submit {
+	display: none;
+}
+
+.step2 #step2, .step2 #submit {
+	display: block;
+}
+
+#result {
+	margin: 40px auto 80px;
+	display: none;
+}
+
+#result-content {
+	margin-bottom: 40px;
+}
+
+#result h2 {
+	font-size: 22px;
+	margin: 40px 0;
+}
+
+#result h3 {
+	font-size: 18px;
+	margin: 30px 0 15px;
+}
+
+#progress table {
+	padding-left: 15px;
+}
+
+.progress #main, .result #main, .error #main {
+	display: none;
+}
+
+.progress #progress, .error #progress {
+	background: #4EBA6F;
+	height: 74px;
+}
+
+.result #result, .error #result {
+	display: block;
+}
+
+footer {
+	border-top: 2px solid #EEE;
+	height: 50px;
+	color: #666;
+	text-align: center;
+}
+
+a {
+	text-decoration: none;
+	font-weight: bold;
+	color: #444;
+}
+
+a:hover, a:active {
+	text-decoration: underline;
+	text-decoration: underline dotted;
+	color: #000;
+}
+
+#progress {
+	/* background: #4EBA6F; */
+	color: #FFF;
+	font-size: 32px;
+	font-family: sans-serif;
+	text-align: center;
+	line-height: 80px;
+	height: 0;
+	border: none;
+	margin: 0;
+	width: 100%;
+	-webkit-box-shadow: inset 0px 0px 12px -6px rgba(0,0,0,0.75);
+	-moz-box-shadow: inset 0px 0px 12px -6px rgba(0,0,0,0.75);
+	box-shadow: inset 0px 0px 12px -6px rgba(0,0,0,0.75);
+	-webkit-transition: height 2s, background-color 2s;
+	transition: height 2s, background-color 2s;
+}
+
+#progress h3 {
+	display: inline;
+	margin: 0;
+}
+
+.loader {
+  display: none;
+  position: relative;
+  width: 50px;
+  height: 50px;
+  vertical-align: middle;
+}
+.progress .loader {
+	display: inline-block;
+}
+
+.loader-bars:before,
+.loader-bars:after,
+.loader-bars span {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 30px;
+  background-color: #fff;
+  -webkit-animation: grow 1.5s linear infinite;
+  animation: grow 1.5s linear infinite;
+}
+
+.loader-bars:after {
+  left: 15px;
+  -webkit-animation: grow 1.5s linear -0.5s infinite;
+  animation: grow 1.5s linear -0.5s infinite;
+}
+
+.loader-bars span {
+  left: 30px;
+  -webkit-animation: grow 1.5s linear -1s infinite;
+  animation: grow 1.5s linear -1s infinite;
+}
+
+@-webkit-keyframes grow {
+  0% {
+    -webkit-transform: scaleY(0);
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  50% {
+    -webkit-transform: scaleY(1);
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: scaleY(0);
+    transform: scaleY(0);
+    opacity: 0;
+  }
+}
+@keyframes grow {
+  0% {
+    -webkit-transform: scaleY(0);
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  50% {
+    -webkit-transform: scaleY(1);
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    -webkit-transform: scaleY(0);
+    transform: scaleY(0);
+    opacity: 0;
+  }
+}
+
+.error #progress {
+	background: #9C1F1f;
+}
+
+#printinfo .big {
+	font-size: 24px;
+	padding-right: 60px;
+}
+
+#printinfo th, #printinfo td {
+	height: 40px;
+	vertical-align: middle;
+}
+
+#printinfo .info {
+	background: #F5F5F5;
+	padding: 10px;
+	border: 1px dotted #CCC;
+}
+
+#officehours td {
+	padding-right: 10px;
+}
+
+.button {
+	background: #E1E1E1;
+	color: #000;
+	border: 1px solid #ADADAD;
+	cursor: default;
+	text-decoration: none !important;
+	text-align: center;
+	font-weight: normal;
+	font-size: 16px;
+	padding: 5px 10px;
+}
+
+.button:hover, .button:active {
+	border-color: #2B79DA;
+	background: #E6F1FB;
+}
+
+.button:active {
+	border: 2px;
+}
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}

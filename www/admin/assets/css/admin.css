@@ -1,0 +1,52 @@
+body, html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	line-height: 20px;
+  	font-weight: 400;
+	color: #3b3b3b;
+	-webkit-font-smoothing: antialiased;
+	font-smoothing: antialiased;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+th, td {
+	border: 0;
+	margin: 0;
+	padding: 0.75em;
+	text-align: right;
+	text-align: center;
+	/* width: 6.25% */
+}
+
+thead th {
+	vertical-align: middle;
+	background: #3169BC;
+	color: #FFF;
+	font-weight: bold;
+	line-height: 1.5em;
+	font-family: "Segoe UI", Tahoma, Helvetica, freesans, sans-serif;
+}
+
+tbody tr:nth-of-type(even) {
+	background: #F5F5F5;
+}
+
+tbody tr:hover {
+	background: #D4D8FF;
+}
+
+button.print {
+	margin: -4px 0;
+	cursor: pointer;
+}
+
+button.print img {
+	margin-top: 4px;
+}

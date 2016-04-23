@@ -1,0 +1,14 @@
+[Unit]
+Description=Print Upload Interface
+
+[Service]
+ExecStart=/usr/local/bin/print
+
+NonBlocking=true
+
+WorkingDirectory=/var/www/print
+
+User=www-print
+Group=www-print
+
+Restart=always
