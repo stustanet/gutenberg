@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	rateThreshold = 2
+	rateThreshold = 4
 	waitSeconds   = 60
 	gcRate        = 5
 )
