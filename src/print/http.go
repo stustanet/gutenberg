@@ -116,7 +116,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		switch lang {
 		case langEN:
 			if err := tplIndexEN.Execute(w, data); err != nil {
-				fmt.Println(err)
+				fmt.Println("get EN", err)
 				http.Error(w,
 					http.StatusText(http.StatusInternalServerError),
 					http.StatusInternalServerError,
@@ -126,7 +126,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		//case langDE:
 		default:
 			if err := tplIndexDE.Execute(w, data); err != nil {
-				fmt.Println(err)
+				fmt.Println("get DE", err)
 				http.Error(w,
 					http.StatusText(http.StatusInternalServerError),
 					http.StatusInternalServerError,
@@ -193,7 +193,7 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 
 	file, fileheader, err := r.FormFile("file")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("upload file:", err)
 		return http.StatusBadRequest
 	}
 	j.Name = fileheader.Filename
@@ -205,7 +205,7 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 	}
 	if err != nil {
 		file.Close()
-		fmt.Println(err)
+		fmt.Println("save upload:", err)
 		return http.StatusInternalServerError
 	}
 	defer f.Close()
@@ -232,7 +232,7 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 
 	// save print job to DB
 	if saveJob(&j) != nil {
-		fmt.Println(err)
+		fmt.Println("saveJob", err)
 		return http.StatusInternalServerError
 	}
 
@@ -313,13 +313,13 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 	switch lang {
 	case langEN:
 		if err := tplResultEN.Execute(w, data); err != nil {
-			fmt.Println(err)
+			fmt.Println("tpl EN:", err)
 			return http.StatusInternalServerError
 		}
 	//case langDE:
 	default:
 		if err := tplResultDE.Execute(w, data); err != nil {
-			fmt.Println(err)
+			fmt.Println("tpl DE:", err)
 			return http.StatusInternalServerError
 		}
 	}
