@@ -12,7 +12,10 @@
     </head>
     <body class="no-js{{with .ResultContent}} result{{else}}{{with .Error}} error{{end}}{{end}}">
         <div id="container">
-            <header><a href="/"><h1><img src="/assets/img/logo.png" alt="StuStaNet e.V." />Druckerservice</h1></a></header>
+            <header class="relative">
+		<a href="/"><h1><img src="/assets/img/logo.png" alt="StuStaNet e.V." />Druckerservice</h1></a>
+		<a href="http://print.stusta.de" class="language-link">English</a>
+	    </header>
             <section id="main">{{if .Main}}
                 <aside>
                     <h2>Willkommen beim StuStaNet e.V. Printer Webinterface.</h2>
