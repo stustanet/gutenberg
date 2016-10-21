@@ -401,14 +401,3 @@ a:hover, a:active {
 .right {
 	float: right;
 }
-
-.relative {
-	position: relative;
-}
-
-.language-link {
-	display: inline;
-	position: absolute;
-	top: 14px;
-	right: 5%;
-}
