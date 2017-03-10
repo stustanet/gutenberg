@@ -5,12 +5,13 @@ Gutenberg is a printing service system consisting of an upload web service and a
 ## systemd socket activation
 
 Gutenberg relies on systemd socket activation for automatic restarts on failures and also to be able to listen on port 80 with an unprivileged user (www-print by default).
+The www-admin socket and service are started by ipsec after the tunnel was established, see `scripts/www-admin_change.sh` and the `ipsec.conf`.
 
 Copy the files in `systemd` to the systemd unit config folder (on Debian: `/etc/systemd/system/`) and modify the config files as needed.
 
 Afterwards, run
 ```sh
-systemctl enable www-admin.socket www-admin.service www-print.socket www-print.service
+systemctl www-print.socket www-print.service
 ```
 
 And to start the services, run:
