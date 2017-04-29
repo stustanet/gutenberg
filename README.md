@@ -11,7 +11,7 @@ Copy the files in `systemd` to the systemd unit config folder (on Debian: `/etc/
 
 Afterwards, run
 ```sh
-systemctl www-print.socket www-print.service
+systemctl enable www-print.socket www-print.service
 ```
 
 And to start the services, run:
