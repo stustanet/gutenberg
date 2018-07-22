@@ -3,12 +3,9 @@ Description=Print Upload Interface
 
 [Service]
 ExecStart=/usr/local/bin/print
-
-NonBlocking=true
-
 WorkingDirectory=/var/www/print
-
+NonBlocking=true
 User=www-print
 Group=www-print
-
 Restart=always
+Sockets=www-print-http.socket www-print-https.socket

@@ -1,16 +1,15 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"html/template"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"strconv"
-	"syscall"
+
+	"github.com/julienschmidt/systemd"
 )
 
 const (
@@ -27,29 +26,17 @@ var (
 	tplResultEN *template.Template
 )
 
-// listenSocket returns a Listener to the first socket passed by systemd
-func listenSocket() (net.Listener, error) {
-	envPid := os.Getenv("LISTEN_PID")
-	if envPid == "" {
-		return nil, errors.New("LISTEN_PID not set. Check systemd socket status")
-	}
-	pid, err := strconv.Atoi(envPid)
-	if err != nil {
-		return nil, err
-	}
+type httpRedirector struct{}
 
-	if pid != os.Getpid() {
-		return nil, errors.New("Listen PID does not match")
-	}
+var _ http.Handler = &httpRedirector{}
 
-	if os.Getenv("LISTEN_FDS") != "1" {
-		return nil, errors.New("Expected 1 socket activation fd, got " +
-			os.Getenv("LISTEN_FDS"))
+func (h *httpRedirector) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	switch r.Host {
+	case hostEN:
+		http.Redirect(w, r, "https://"+hostEN, http.StatusFound)
+	default:
+		http.Redirect(w, r, "https://"+hostDE, http.StatusFound)
 	}
-
-	const fd = 3 // first systemd socket
-	syscall.CloseOnExec(fd)
-	return net.FileListener(os.NewFile(fd, ""))
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +53,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	case hostDE:
 		//
 	default:
-		http.Redirect(w, r, "http://"+hostDE, http.StatusFound)
+		http.Redirect(w, r, "https://"+hostDE, http.StatusFound)
 		return
 	}
 
@@ -328,10 +315,35 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 }
 
 func main() {
-	listener, err := listenSocket()
+	// get sockets passed by systemd
+	var httpListener net.Listener
+	var httpsListener net.Listener
+	sockets, err := systemd.ListenWithNames()
 	if err != nil {
 		panic(err)
 	}
+	if len(sockets) != 2 {
+		panic(fmt.Sprintf("expected 2 sockets, got %d", len(sockets)))
+	}
+	for i, socket := range sockets {
+		switch name := socket.Name(); name {
+		case "http":
+			httpListener, err = socket.Listener()
+			if err != nil {
+				panic(err)
+			}
+		case "https":
+			httpsListener, err = socket.Listener()
+			if err != nil {
+				panic(err)
+			}
+		default:
+			panic(fmt.Sprintf("unexpected socket name %s (i=%d)", name, i))
+		}
+	}
+
+	// redirect http requests to https
+	go http.Serve(httpListener, new(httpRedirector))
 
 	// init Upload Request Ratelimiter
 	uplimit = NewRateLimiter()
@@ -359,5 +371,5 @@ func main() {
 		http.ServeFile(w, r, "favicon.ico")
 	})
 	http.HandleFunc("/", index)
-	http.Serve(listener, nil)
+	http.ServeTLS(httpsListener, nil, tlsCert, tlsPrivKey)
 }
