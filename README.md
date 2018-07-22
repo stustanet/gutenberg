@@ -11,12 +11,12 @@ Copy the files in `systemd` to the systemd unit config folder (on Debian: `/etc/
 
 Afterwards, run
 ```sh
-systemctl enable www-print.socket www-print.service
+systemctl enable www-admin.socket www-print-http.socket www-print-https.socket
 ```
 
 And to start the services, run:
 ```sh
-systemctl start www-admin.socket www-admin.service www-print.socket www-print.service
+systemctl start www-admin.socket www-admin.service www-print-http.socket www-print-https.socket www-print.service
 ```
 
 ## SQL Schema
