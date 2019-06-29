@@ -11,8 +11,24 @@ import (
 )
 
 type Job struct {
+	Pin      string
 	File     string
+	Ip       string
 	CMYK     Coverage // ink coverage
+	Duplex   string
+	BW       bool
+	Internal bool
+	Pages    int
+	Sheets   int
+	Copies   int
+	Price    float64 // per copy
+	Total    float64 // total amount
+	Created  time.Time
+	Printed  time.Time
+	Err      error
+}
+
+type Log struct {
 	Duplex   string
 	BW       bool
 	Internal bool

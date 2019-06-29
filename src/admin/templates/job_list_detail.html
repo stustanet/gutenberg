@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Print Jobs</title>
+    <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th>PIN</th>
+        <th>File</th>
+        <th>IP</th>
+        <th>B/W</th>
+        <th>Cyan</th>
+        <th>Magenta</th>
+        <th>Yellow</th>
+        <th>Key</th>
+        <th>Duplex</th>
+        <th>Pages</th>
+        <th>Sheets</th>
+        <th>Price</th>
+        <th>Copies</th>
+        <th>Date</th>
+        <th>Error</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range .jobs}}
+        <tr>
+            <td>{{.Pin}}</td>
+            <td>{{.File}}</td>
+            <td>{{.Ip}}</td>
+            <td>{{.BW}}</td>
+            <td>{{.CMYK.Cyan}}</td>
+            <td>{{.CMYK.Magenta}}</td>
+            <td>{{.CMYK.Yellow}}</td>
+            <td>{{.CMYK.Key}}</td>
+            <td>{{.Duplex}}</td>
+            <td>{{.Pages}}</td>
+            <td>{{.Sheets}}</td>
+            <td>{{.Price}}</td>
+            <td>{{.Copies}}</td>
+            <td>{{.Pin}}</td>
+            <td>{{.Date}}</td>
+            <td>{{.Error}}</td>
+        </tr>
+    {{end}}
+    </tbody>
+</table>
+
+</body>
+</html>

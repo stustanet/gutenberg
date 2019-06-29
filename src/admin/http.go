@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"html/template"
 	"log"
 	"net"
 	"net/http"
@@ -38,15 +39,36 @@ func checkmark(b bool) string {
 }
 
 func detail(w http.ResponseWriter, r *http.Request) {
-	listJobsDetail(w)
+	tmpl := template.Must(template.ParseFiles("templates/job_list_detail.html"))
+
+	data := listJobsDetail()
+
+	err := tmpl.Execute(w, data)
+	if err != nil {
+		// do something
+	}
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	listJobs(w)
+	tmpl := template.Must(template.ParseFiles("templates/job_list.html"))
+
+	data := listJobs()
+
+	err := tmpl.Execute(w, data)
+	if err != nil {
+		// do something
+	}
 }
 
 func logs(w http.ResponseWriter, r *http.Request) {
-	listLog(w)
+	tmpl := template.Must(template.ParseFiles("templates/log_list.html"))
+
+	data := listLog()
+
+	err := tmpl.Execute(w, data)
+	if err != nil {
+		// do something
+	}
 }
 
 func print(w http.ResponseWriter, r *http.Request) {
@@ -79,10 +101,10 @@ func main() {
 	connectDB()
 	startCleaner()
 
-	listener, err := listenSocket()
-	if err != nil {
-		panic(err)
-	}
+	//listener, err := listenSocket()
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	http.Handle("/assets/", http.FileServer(http.Dir(".")))
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
@@ -92,5 +114,6 @@ func main() {
 	http.HandleFunc("/log", logs)
 	http.HandleFunc("/print", print)
 	http.HandleFunc("/", index)
-	http.Serve(listener, nil)
+	//http.Serve(listener, nil)
+	http.ListenAndServe(":8080", nil)
 }

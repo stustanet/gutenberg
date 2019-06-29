@@ -3,8 +3,6 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"fmt"
-	"io"
 	"log"
 	"time"
 
@@ -26,15 +24,16 @@ func connectDB() {
 	}
 }
 
-func listJobs(w io.Writer) {
+func listJobs() (jobs []Job) {
 	rows, err := db.Query("SELECT pin, bw, duplex, pages, sheets, price, copies, date, error FROM job ORDER BY id DESC")
 	if err != nil {
-		fmt.Fprintln(w, err)
+		//fmt.Fprintln(w, err)
 		return
 	}
 
-	fmt.Fprintln(w, "<!doctype html><html><head><title>Print Jobs</title><link rel=\"stylesheet\" href=\"/assets/css/admin.css\"></head>")
-	fmt.Fprintln(w, "<body><table><thead><tr><th>PIN</th><th>B/W</th><th>Duplex</th><th>Pages</th><th>Sheets</th><th>Price</th><th>Copies</th><th>Total</th><th>Date</th><th>Error</th><th>Action</th></tr></thead><tbody>")
+	job := Job{}
+
+	//fmt.Fprintln(w, "<body><table><thead><tr><th>PIN</th><th>B/W</th><th>Duplex</th><th>Pages</th><th>Sheets</th><th>Price</th><th>Copies</th><th>Total</th><th>Date</th><th>Error</th><th>Action</th></tr></thead><tbody>")
 	defer rows.Close()
 	var pin, duplex string
 	var pages, sheets, copies int
@@ -45,31 +44,41 @@ func listJobs(w io.Writer) {
 	for rows.Next() {
 		err := rows.Scan(&pin, &bw, &duplex, &pages, &sheets, &price, &copies, &date, &error)
 		if err != nil {
-			fmt.Fprintln(w, err)
+			//fmt.Fprintln(w, err)
 			return
 		}
-		total := price * float64(copies)
-		fmt.Fprintf(w, "<tr><th>%s</th><td>%s</td><td>%s</td><td>%d</td><td>%d</td><td>%.02f &euro;</td><td>%d</td><td>%.02f &euro;</td><td>%s</td><td>%s</td><td><button class=\"print\" onclick=\"print('%s', '%.02f')\"><img src=\"/assets/img/print.png\" alt=\"Print\" /></button></td></tr>",
-			pin, checkmark(bw), duplex, pages, sheets, price, copies, total, date.Format("2006-01-02 15:04:05"), error.String, pin, total,
-		)
+
+		job.BW = bw
+		job.Copies = copies
+		job.Duplex = duplex
+		job.Pin = pin
+		job.Pages = pages
+		job.Sheets = sheets
+		job.Created = date
+		job.Total = price * float64(copies)
+
+		//fmt.Fprintf(w, "<tr><th>%s</th><td>%s</td><td>%s</td><td>%d</td><td>%d</td><td>%.02f &euro;</td><td>%d</td><td>%.02f &euro;</td><td>%s</td><td>%s</td><td><button class=\"print\" onclick=\"print('%s', '%.02f')\"><img src=\"/assets/img/print.png\" alt=\"Print\" /></button></td></tr>",
+		//	pin, checkmark(bw), duplex, pages, sheets, price, copies, total, date.Format("2006-01-02 15:04:05"), error.String, pin, total,
+		//)
 	}
-	fmt.Fprintln(w, "</tbody></table>")
 	if err = rows.Err(); err != nil {
-		fmt.Fprintln(w, err)
+		//fmt.Fprintln(w, err)
 		return
 	}
-	fmt.Fprintln(w, "<script src=\"assets/js/admin.js\"></script></body></html>")
+
+	return jobs
 }
 
-func listJobsDetail(w io.Writer) {
+func listJobsDetail() (jobs []Job) {
 	rows, err := db.Query("SELECT pin, file_id, ip_address, bw, cyan, magenta, yellow, key, duplex, pages, sheets, price, copies, date, error FROM job ORDER BY id DESC")
-	if err != nil {
-		fmt.Fprintln(w, err)
-		return
-	}
+	//if err != nil {
+	//	fmt.Fprintln(w, err)
+	//	return
+	//}
 
-	fmt.Fprintln(w, "<!doctype html><html><head><title>Print Jobs</title><link rel=\"stylesheet\" href=\"/assets/css/admin.css\"></head>")
-	fmt.Fprintln(w, "<body><table><thead><tr><th>PIN</th><th>File</th><th>IP</th><th>B/W</th><th>Cyan</th><th>Magenta</th><th>Yellow</th><th>Key</th><th>Duplex</th><th>Pages</th><th>Sheets</th><th>Price</th><th>Copies</th><th>Date</th><th>Error</th></tr></thead><tbody>")
+	job := Job{}
+
+	//fmt.Fprintln(w, "<body><table><thead><tr><th>PIN</th><th>File</th><th>IP</th><th>B/W</th><th>Cyan</th><th>Magenta</th><th>Yellow</th><th>Key</th><th>Duplex</th><th>Pages</th><th>Sheets</th><th>Price</th><th>Copies</th><th>Date</th><th>Error</th></tr></thead><tbody>")
 	defer rows.Close()
 	var pin, file, ip, duplex string
 	var pages, sheets, copies int
@@ -80,31 +89,51 @@ func listJobsDetail(w io.Writer) {
 	for rows.Next() {
 		err := rows.Scan(&pin, &file, &ip, &bw, &cyan, &magenta, &yellow, &key, &duplex, &pages, &sheets, &price, &copies, &date, &error)
 		if err != nil {
-			fmt.Fprintln(w, err)
+			//fmt.Fprintln(w, err)
 			return
 		}
-		fmt.Fprintf(w,
-			"<tr><th>%s</th><td>%s</td><td>%s</td><td>%t</td><td>%f</td><td>%f</td><td>%f</td><td>%f</td><td>%s</td><td>%d</td><td>%d</td><td>%.02f &euro;</td><td>%d</td><td>%s</td><td>%s</td></tr>",
-			pin, file, ip, bw, cyan, magenta, yellow, key, duplex, pages, sheets, price, copies, date.Format("2006-01-02 15:04:05"), error.String,
-		)
+
+		job.BW = bw
+		job.Copies = copies
+		job.Duplex = duplex
+		job.Pages = pages
+		job.Price = price
+		job.Pin = pin
+		job.Created = date
+		job.File = file
+		job.Sheets = sheets
+		job.Ip = ip
+		job.CMYK.Cyan = cyan
+		job.CMYK.Magenta = magenta
+		job.CMYK.Yellow = yellow
+		job.CMYK.Key = key
+
+		jobs = append(jobs, job)
+
+		//fmt.Fprintf(w,
+		//	"<tr><th>%s</th><td>%s</td><td>%s</td><td>%t</td><td>%f</td><td>%f</td><td>%f</td><td>%f</td><td>%s</td><td>%d</td><td>%d</td><td>%.02f &euro;</td><td>%d</td><td>%s</td><td>%s</td></tr>",
+		//	pin, file, ip, bw, cyan, magenta, yellow, key, duplex, pages, sheets, price, copies, date.Format("2006-01-02 15:04:05"), error.String,
+		//)
 	}
-	fmt.Fprintln(w, "</tbody></table>")
 	if err = rows.Err(); err != nil {
-		fmt.Fprintln(w, err)
+		//fmt.Fprintln(w, err)
 		return
 	}
-	fmt.Fprintln(w, "</body></html>")
+
+	return jobs
 }
 
-func listLog(w io.Writer) {
+func listLog() (logs []Log) {
 	rows, err := db.Query("SELECT internal, bw, duplex, pages, sheets, price, copies, create_date, print_date, error FROM log ORDER BY id DESC")
 	if err != nil {
-		fmt.Fprintln(w, err)
+		//fmt.Fprintln(w, err)
 		return
 	}
 
-	fmt.Fprintln(w, "<!doctype html><html><head><title>Logged Jobs</title><link rel=\"stylesheet\" href=\"/assets/css/admin.css\"></head>")
-	fmt.Fprintln(w, "<body><table><thead><tr><th>Internal</th><th>B/W</th><th>Duplex</th><th>Pages</th><th>Sheets</th><th>Price</th><th>Copies</th><th>Total</th><th>Create Date</th><th>Print Date</th><th>Error</th></tr></thead><tbody>")
+	log := Log{}
+
+	//fmt.Fprintln(w, "<!doctype html><html><head><title>Logged Jobs</title><link rel=\"stylesheet\" href=\"/assets/css/admin.css\"></head>")
+	//fmt.Fprintln(w, "<body><table><thead><tr><th>Internal</th><th>B/W</th><th>Duplex</th><th>Pages</th><th>Sheets</th><th>Price</th><th>Copies</th><th>Total</th><th>Create Date</th><th>Print Date</th><th>Error</th></tr></thead><tbody>")
 	defer rows.Close()
 	var duplex string
 	var pages, sheets, copies int
@@ -115,20 +144,33 @@ func listLog(w io.Writer) {
 	for rows.Next() {
 		err := rows.Scan(&internal, &bw, &duplex, &pages, &sheets, &price, &copies, &createDate, &printDate, &error)
 		if err != nil {
-			fmt.Fprintln(w, err)
+			//fmt.Fprintln(w, err)
 			return
 		}
-		fmt.Fprintf(w,
-			"<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td><td>%.02f &euro;</td><td>%d</td><td>%.02f &euro;</td><td>%s</td><td>%s</td><td>%s</td></tr>",
-			checkmark(internal), checkmark(bw), duplex, pages, sheets, price, copies, (price * float64(copies)), createDate.Format("2006-01-02 15:04:05"), printDate.Format("2006-01-02 15:04:05"), error.String,
-		)
+
+		log.BW = bw
+		log.Duplex = duplex
+		log.Pages = pages
+		log.Sheets = sheets
+		log.Copies = copies
+		log.Created = createDate
+		log.Printed = printDate
+		log.Internal = internal
+		log.Total = price * float64(copies)
+
+		logs = append(logs, log)
+		//fmt.Fprintf(w,
+		//	"<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td><td>%.02f &euro;</td><td>%d</td><td>%.02f &euro;</td><td>%s</td><td>%s</td><td>%s</td></tr>",
+		//	checkmark(internal), checkmark(bw), duplex, pages, sheets, price, copies, (price * float64(copies)), createDate.Format("2006-01-02 15:04:05"), printDate.Format("2006-01-02 15:04:05"), error.String,
+		//)
 	}
-	fmt.Fprintln(w, "</tbody></table>")
+
 	if err = rows.Err(); err != nil {
-		fmt.Fprintln(w, err)
+		//fmt.Fprintln(w, err)
 		return
 	}
-	fmt.Fprintln(w, "</body></html>")
+
+	return logs
 }
 
 func getJob(pin string) (*Job, error) {

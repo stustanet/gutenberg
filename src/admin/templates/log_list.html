@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Logged Jobs</title>
+  <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+<table>
+  <thead>
+  <tr>
+    <th>Internal</th>
+    <th>B/W</th>
+    <th>Duplex</th>
+    <th>Pages</th>
+    <th>Sheets</th>
+    <th>Price</th>
+    <th>Copies</th>
+    <th>Total</th>
+    <th>Create Date</th>
+    <th>Print Date</th>
+    <th>Error</th>
+  </tr>
+  </thead>
+  <tbody>
+  {{range .logs}}
+    <tr>
+      <td>{{.Internal}}</td>
+      <td>{{.BW}}</td>
+      <td>{{.Duplex}}</td>
+      <td>{{.Pages}}</td>
+      <td>{{.Sheets}}</td>
+      <td>{{.Price}}</td>
+      <td>{{.Copies}}</td>
+      <td>{{.Total}}</td>
+      <td>{{.Created}}</td>
+      <td>{{.Printed}}</td>
+      <td>{{.Error}}</td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+</body>
+</html>
