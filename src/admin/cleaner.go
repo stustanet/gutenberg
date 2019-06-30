@@ -7,18 +7,18 @@ import (
 	"time"
 )
 
-func startCleaner() {
+func startCleaner(config *Config) {
 	// cleanup once per hour
 	ticker := time.NewTicker(time.Hour * 1)
 	go func() {
 		for t := range ticker.C {
-			cleanup(t)
+			cleanup(t, config)
 		}
 	}()
 }
 
-func cleanup(t time.Time) {
-	files, err := ioutil.ReadDir(uploadPath)
+func cleanup(t time.Time, config *Config) {
+	files, err := ioutil.ReadDir(config.UploadPath)
 	if err != nil {
 		log.Println(err)
 		return
@@ -31,8 +31,8 @@ func cleanup(t time.Time) {
 
 	for _, file := range files {
 		// Delete file older than x days
-		if t.Sub(file.ModTime()) > pruneUploads {
-			log.Println("DELETE", file.Name(), os.Remove(uploadPath+file.Name()))
+		if int(t.Sub(file.ModTime())) > config.PruneUploads {
+			log.Println("DELETE", file.Name(), os.Remove(config.UploadPath+file.Name()))
 		}
 	}
 }

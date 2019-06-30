@@ -23,7 +23,7 @@ var (
 // This function should be called from a separate goroutine.
 func NextOfficeHours(p *[]OfficeHour, done chan bool) {
 	officeHoursMu.RLock()
-	if time.Since(officeHoursUpdate) < officeHoursMaxAge {
+	if int(time.Since(officeHoursUpdate)) < config.OfficeHoursMaxAge {
 		*p = officeHoursCache
 		officeHoursMu.RUnlock()
 		done <- true
@@ -36,7 +36,7 @@ func NextOfficeHours(p *[]OfficeHour, done chan bool) {
 
 	// Rule #2: Always double tap.
 	// The cache might have changed while we waited for the lock
-	if time.Since(officeHoursUpdate) < officeHoursMaxAge {
+	if int(time.Since(officeHoursUpdate)) < config.OfficeHoursMaxAge {
 		*p = officeHoursCache
 		officeHoursMu.Unlock()
 		done <- true
@@ -52,7 +52,7 @@ func NextOfficeHours(p *[]OfficeHour, done chan bool) {
 
 func updateOfficeHours() {
 	// Fetch appointments.json
-	resp, err := http.Get(officeHoursURL)
+	resp, err := http.Get(config.OfficeHoursURL)
 	if err != nil {
 		return
 	}

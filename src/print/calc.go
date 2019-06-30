@@ -26,6 +26,7 @@ type Job struct {
 	CMYK     Coverage // ink coverage
 	PIN      int      // print job PIN (generated)
 	Duplex   int8
+	Format   string   // A5, A4, A3
 	BW       bool
 	Pages    int
 	Sheets   int
@@ -44,8 +45,8 @@ type Coverage struct {
 }
 
 func (c *Coverage) Price() float64 {
-	return ((c.Cyan + c.Magenta + c.Yellow) * priceColor) +
-		(c.Key * priceBlack)
+	return ((c.Cyan + c.Magenta + c.Yellow) * config.PriceColor) +
+		(c.Key * config.PriceBlack)
 }
 
 func (c *Coverage) Print(w io.Writer, page int) {
@@ -235,8 +236,8 @@ func pdfPkpgcounter(j *Job) {
 	}
 
 	j.Price = sum.Price() + // ink
-		(float64(num) * priceFuser) + // fuser
-		(float64(j.Sheets) * priceSheet) // paper
+		(float64(num) * config.PriceFuser) + // fuser
+		(float64(j.Sheets) * config.PriceSheet) // paper
 	j.Total = j.Price * float64(j.Copies)
 }
 

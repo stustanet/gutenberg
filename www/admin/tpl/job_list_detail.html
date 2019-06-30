@@ -10,37 +10,46 @@
   <thead>
   <tr>
     <th>PIN</th>
+    <th>File</th>
+    <th>IP</th>
     <th>B/W</th>
+    <th>Cyan</th>
+    <th>Magenta</th>
+    <th>Yellow</th>
+    <th>Key</th>
     <th>Duplex</th>
+    <th>Format</th>
     <th>Pages</th>
     <th>Sheets</th>
     <th>Price</th>
     <th>Copies</th>
-    <th>Total</th>
     <th>Date</th>
     <th>Error</th>
-    <th>Action</th>
   </tr>
   </thead>
   <tbody>
-  {{range .jobs}}
+  {{range .}}
     <tr>
       <td>{{.Pin}}</td>
+      <td>{{.File}}</td>
+      <td>{{.Ip}}</td>
       <td>{{.BW}}</td>
+      <td>{{.CMYK.Cyan}}</td>
+      <td>{{.CMYK.Magenta}}</td>
+      <td>{{.CMYK.Yellow}}</td>
+      <td>{{.CMYK.Key}}</td>
       <td>{{.Duplex}}</td>
+      <td>{{.Format}}</td>
       <td>{{.Pages}}</td>
       <td>{{.Sheets}}</td>
       <td>{{.Price}}</td>
       <td>{{.Copies}}</td>
-      <td>{{.Pin}}</td>
-      <td>{{.Date}}</td>
-      <td>{{.Error}}</td>
-      <td><button class=\"print\" onclick="print('{{.Pin}}', '{{.Price}}')"><img src="/assets/img/print.png" alt="Print" /></button>
+      <td>{{.Created.Format "2006-01-02 15:04:05" }}</td>
+      <td>{{.Err }}</td>
     </tr>
   {{end}}
   </tbody>
 </table>
 
-<script src="assets/js/admin.js"></script>
 </body>
 </html>

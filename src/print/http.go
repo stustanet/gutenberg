@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"html/template"
 	"io"
@@ -19,12 +20,9 @@ const (
 
 var uplimit *RateLimiter
 
-var (
-	tplIndexDE  *template.Template
-	tplIndexEN  *template.Template
-	tplResultDE *template.Template
-	tplResultEN *template.Template
-)
+var tmpl *template.Template
+
+var config *Config
 
 type httpRedirector struct{}
 
@@ -32,10 +30,10 @@ var _ http.Handler = &httpRedirector{}
 
 func (h *httpRedirector) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Host {
-	case hostEN:
-		http.Redirect(w, r, "https://"+hostEN, http.StatusFound)
+	case config.HostEN:
+		http.Redirect(w, r, "https://"+config.HostEN, http.StatusFound)
 	default:
-		http.Redirect(w, r, "https://"+hostDE, http.StatusFound)
+		http.Redirect(w, r, "https://"+config.HostDE, http.StatusFound)
 	}
 }
 
@@ -48,12 +46,12 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 	lang := langDE
 	switch r.Host {
-	case hostEN:
+	case config.HostEN:
 		lang = langEN
-	case hostDE:
+	case config.HostDE:
 		//
 	default:
-		http.Redirect(w, r, "https://"+hostDE, http.StatusFound)
+		http.Redirect(w, r, "https://"+config.HostDE, http.StatusFound)
 		return
 	}
 
@@ -65,7 +63,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		MaxFileSize   uint
 		Error         string
 		ResultContent template.HTML
-	}{Code: 200, Main: true, MaxFileSize: MaxFileSize}
+	}{Code: 200, Main: true, MaxFileSize: uint(config.MaxFileSize)}
 
 	// DO NOT CHANGE THE ORDER!
 	// we use fallthrough here!
@@ -102,7 +100,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		}
 		switch lang {
 		case langEN:
-			if err := tplIndexEN.Execute(w, data); err != nil {
+			if err := tmpl.ExecuteTemplate(w, "index_en.html", data); err != nil {
 				fmt.Println("get EN", err)
 				http.Error(w,
 					http.StatusText(http.StatusInternalServerError),
@@ -112,7 +110,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 			}
 		//case langDE:
 		default:
-			if err := tplIndexDE.Execute(w, data); err != nil {
+			if err := tmpl.ExecuteTemplate(w, "index_de.html", data); err != nil {
 				fmt.Println("get DE", err)
 				http.Error(w,
 					http.StatusText(http.StatusInternalServerError),
@@ -147,19 +145,29 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 	}
 
 	// limit file size
-	if r.ContentLength > MaxFileSize {
+	if r.ContentLength > int64(config.MaxFileSize) {
 		return http.StatusRequestEntityTooLarge
 	}
-	r.Body = http.MaxBytesReader(w, r.Body, MaxFileSize)
+	r.Body = http.MaxBytesReader(w, r.Body, int64(config.MaxFileSize))
 
 	// validate form input
-	if r.ParseMultipartForm(MaxFileSize) != nil {
+	if r.ParseMultipartForm(int64(config.MaxFileSize)) != nil {
 		return http.StatusBadRequest
 	}
 
 	j.IP = r.RemoteAddr
 	j.BW = (r.FormValue("bw") == "bw")
 	j.Password = r.FormValue("password")
+
+	switch r.FormValue("format") {
+	case "A5", "A4", "A3":
+		j.Format = r.FormValue("format")
+	case "":
+		j.Format = "A4"
+	default:
+		return http.StatusBadRequest
+	}
+
 
 	switch r.FormValue("duplex") {
 	case "no":
@@ -299,13 +307,13 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 
 	switch lang {
 	case langEN:
-		if err := tplResultEN.Execute(w, data); err != nil {
+		if err := tmpl.ExecuteTemplate(w, "result_en.html", data); err != nil {
 			fmt.Println("tpl EN:", err)
 			return http.StatusInternalServerError
 		}
 	//case langDE:
 	default:
-		if err := tplResultDE.Execute(w, data); err != nil {
+		if err := tmpl.ExecuteTemplate(w, "result_de.html", data); err != nil {
 			fmt.Println("tpl DE:", err)
 			return http.StatusInternalServerError
 		}
@@ -315,61 +323,64 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 }
 
 func main() {
+	noSocket := *flag.Bool("no-socket", true, "Do not run under a socket.")
+	flag.Parse()
+
+	// TODO: passable config file
+	//config = getConfig("/etc/ssn/gutenberg/admin-config.json")
+	config, _ = getConfig("../../src/print/config.json")
+	fmt.Println(config)
+
+	connectDB(config.Dsn)
+
 	// get sockets passed by systemd
 	var httpListener net.Listener
 	var httpsListener net.Listener
-	sockets, err := systemd.ListenWithNames()
-	if err != nil {
-		panic(err)
-	}
-	if len(sockets) != 2 {
-		panic(fmt.Sprintf("expected 2 sockets, got %d", len(sockets)))
-	}
-	for i, socket := range sockets {
-		switch name := socket.Name(); name {
-		case "http":
-			httpListener, err = socket.Listener()
-			if err != nil {
-				panic(err)
-			}
-		case "https":
-			httpsListener, err = socket.Listener()
-			if err != nil {
-				panic(err)
-			}
-		default:
-			panic(fmt.Sprintf("unexpected socket name %s (i=%d)", name, i))
-		}
-	}
 
-	// redirect http requests to https
-	go http.Serve(httpListener, new(httpRedirector))
+	if !noSocket {
+		sockets, err := systemd.ListenWithNames()
+		if err != nil {
+			panic(err)
+		}
+		if len(sockets) != 2 {
+			panic(fmt.Sprintf("expected 2 sockets, got %d", len(sockets)))
+		}
+		for i, socket := range sockets {
+			switch name := socket.Name(); name {
+			case "http":
+				httpListener, err = socket.Listener()
+				if err != nil {
+					panic(err)
+				}
+			case "https":
+				httpsListener, err = socket.Listener()
+				if err != nil {
+					panic(err)
+				}
+			default:
+				panic(fmt.Sprintf("unexpected socket name %s (i=%d)", name, i))
+			}
+		}
+
+		// redirect http requests to https
+		go http.Serve(httpListener, new(httpRedirector))
+	}
 
 	// init Upload Request Ratelimiter
 	uplimit = NewRateLimiter()
 
 	// init templates
-	tplIndexDE, err = template.ParseFiles("tpl/index_de.html")
-	if err != nil {
-		panic(err)
-	}
-	tplIndexEN, err = template.ParseFiles("tpl/index_en.html")
-	if err != nil {
-		panic(err)
-	}
-	tplResultDE, err = template.ParseFiles("tpl/result_de.html")
-	if err != nil {
-		panic(err)
-	}
-	tplResultEN, err = template.ParseFiles("tpl/result_en.html")
-	if err != nil {
-		panic(err)
-	}
+	tmpl = template.Must(template.ParseGlob("tpl/*.html"))
 
 	http.Handle("/assets/", http.FileServer(http.Dir(".")))
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "favicon.ico")
 	})
 	http.HandleFunc("/", index)
-	http.ServeTLS(httpsListener, nil, tlsCert, tlsPrivKey)
+
+	if noSocket {
+		http.ListenAndServe(":8000", nil)
+	} else {
+		http.ServeTLS(httpsListener, nil, config.TlsCert, config.TlsPrivKey)
+	}
 }

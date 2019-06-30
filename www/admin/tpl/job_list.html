@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Print Jobs</title>
+  <link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+<table>
+  <thead>
+  <tr>
+    <th>PIN</th>
+    <th>B/W</th>
+    <th>Duplex</th>
+    <th>Format</th>
+    <th>Pages</th>
+    <th>Sheets</th>
+    <th>Price</th>
+    <th>Copies</th>
+    <th>Total</th>
+    <th>Created</th>
+    <th>Printed</th>
+    <th>Error</th>
+    <th>Action</th>
+  </tr>
+  </thead>
+  <tbody>
+  {{range .Jobs}}
+    <tr>
+      <td>{{.Pin}}</td>
+      <td>{{checkmark .BW}}</td>
+      <td>{{.Duplex}}</td>
+      <td>{{.Format}}</td>
+      <td>{{.Pages}}</td>
+      <td>{{.Sheets}}</td>
+      <td>{{.Price}}</td>
+      <td>{{.Copies}}</td>
+      <td>{{.Total}}</td>
+      <td>{{.Created.Format "2006-01-02 15:04:05" }}</td>
+      <td>{{.Printed.Format "2006-01-02 15:04:05" }}</td>
+      <td>{{.Err }}</td>
+      <td>
+        <button class="print" onclick="openModal('{{.Pin}}', '{{.Price}}', '{{.Format}}')">
+          <img src="/assets/img/print.png" alt="Print"/>
+        </button>
+      </td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+
+<div id="print-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="modal-close">&times;</span>
+      <h2>Print Confirmation</h2>
+    </div>
+    <div class="modal-body">
+      <p>Pin: <span id="pin"></span></p>
+      <p>Price: <span id="price"></span>€</p>
+      <div>
+        <label id="label-printer" for="printer">Select Printer</label>
+        <select id="printer">
+            {{range .Printers}}
+              <option value="{{.Name}}">{{.Name}}</option>
+            {{end}}
+        </select>
+      </div>
+      <div>
+        <label id="label-format" for="format">Printing Format</label>
+        <select id="format">
+          {{range .FormatOptions}}
+            <option value="{{.}}">{{.}}</option>
+          {{end}}
+        </select>
+      </div>
+      <div>
+        <label id="label-internal" for="internal">Internal Print</label>
+        <input type="checkbox" id="internal">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" onclick="print()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/admin.js"></script>
+</body>
+</html>

@@ -12,6 +12,7 @@
     <th>Internal</th>
     <th>B/W</th>
     <th>Duplex</th>
+    <th>Format</th>
     <th>Pages</th>
     <th>Sheets</th>
     <th>Price</th>
@@ -23,19 +24,20 @@
   </tr>
   </thead>
   <tbody>
-  {{range .logs}}
+  {{range .}}
     <tr>
       <td>{{.Internal}}</td>
       <td>{{.BW}}</td>
       <td>{{.Duplex}}</td>
+      <td>{{.Format}}</td>
       <td>{{.Pages}}</td>
       <td>{{.Sheets}}</td>
       <td>{{.Price}}</td>
       <td>{{.Copies}}</td>
       <td>{{.Total}}</td>
-      <td>{{.Created}}</td>
-      <td>{{.Printed}}</td>
-      <td>{{.Error}}</td>
+      <td>{{.Created.Format "2006-01-02 15:04:05"}}</td>
+      <td>{{.Printed.Format "2006-01-02 15:04:05"}}</td>
+      <td>{{.Err}}</td>
     </tr>
   {{end}}
   </tbody>

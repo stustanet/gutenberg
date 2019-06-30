@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"flag"
+	"fmt"
 	"html/template"
 	"log"
 	"net"
@@ -9,6 +11,11 @@ import (
 	"os"
 	"strconv"
 	"syscall"
+)
+
+var (
+	tmpl   *template.Template
+	config *Config
 )
 
 func listenSocket() (net.Listener, error) {
@@ -31,43 +38,38 @@ func listenSocket() (net.Listener, error) {
 	return net.FileListener(os.NewFile(fd, ""))
 }
 
-func checkmark(b bool) string {
-	if b {
-		return "&#x2713;"
-	}
-	return "&#x2717;"
-}
-
 func detail(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/job_list_detail.html"))
+	data, err := listJobsDetail()
 
-	data := listJobsDetail()
-
-	err := tmpl.Execute(w, data)
+	err = tmpl.ExecuteTemplate(w, "job_list_detail.html", data)
 	if err != nil {
-		// do something
+		fmt.Print(err)
 	}
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/job_list.html"))
+	jobs, err := listJobs()
 
-	data := listJobs()
+	type Data struct {
+		Jobs     []Job
+		Printers []Printer
+		FormatOptions []string
+	}
 
-	err := tmpl.Execute(w, data)
+	data := Data{jobs, config.Printers, formats}
+
+	err = tmpl.ExecuteTemplate(w, "job_list.html", data)
 	if err != nil {
-		// do something
+		fmt.Print(err)
 	}
 }
 
 func logs(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/log_list.html"))
+	data, err := listLog()
 
-	data := listLog()
-
-	err := tmpl.Execute(w, data)
+	err = tmpl.ExecuteTemplate(w, "log_list.html", data)
 	if err != nil {
-		// do something
+		fmt.Print(err)
 	}
 }
 
@@ -88,9 +90,33 @@ func print(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	job.Internal = r.FormValue("internal") == "1"
+	fmt.Println(r.FormValue("internal"))
+	job.Internal = r.FormValue("internal") == "true"
 
-	if err = printJob(w, job); err != nil {
+	format := r.FormValue("format")
+	if format == "A5" || format == "A4" || format == "A3" {
+		job.Format = format
+	} else {
+		http.Error(w, "Invalid FOrmat", http.StatusBadRequest)
+		return
+	}
+
+	printerName := r.FormValue("printer")
+	var printer Printer
+	validPrinter := false
+	for _, p := range config.Printers {
+		if p.Name == printerName {
+			validPrinter = true
+			printer = p
+		}
+	}
+
+	if !validPrinter {
+		http.Error(w, "Invalid Printer", http.StatusBadRequest)
+		return
+	}
+
+	if err = printJob(w, job, printer, config); err != nil {
 		log.Println("Error:", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -98,13 +124,34 @@ func print(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	connectDB()
-	startCleaner()
+	noSocket := *flag.Bool("no-socket", true, "Do not run as a socket")
+	flag.Parse()
 
-	//listener, err := listenSocket()
-	//if err != nil {
-	//	panic(err)
-	//}
+	//config = getConfig("/etc/ssn/gutenberg/admin-config.json")
+	config, _ = getConfig("../../src/admin/config.json")
+	fmt.Println(config)
+
+	tmpl = template.Must(template.New("main").Funcs(template.FuncMap{
+		"checkmark": func(value bool) template.HTML {
+			if value {
+				return "&#x2713;"
+			}
+			return "&#x2717;"
+		},
+	}).ParseGlob("tpl/*.html"))
+
+	connectDB(config.Dsn)
+	startCleaner(config)
+
+	var listener net.Listener
+
+	if !noSocket {
+		var err error
+		listener, err = listenSocket()
+		if err != nil {
+			panic(err)
+		}
+	}
 
 	http.Handle("/assets/", http.FileServer(http.Dir(".")))
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
@@ -114,6 +161,10 @@ func main() {
 	http.HandleFunc("/log", logs)
 	http.HandleFunc("/print", print)
 	http.HandleFunc("/", index)
-	//http.Serve(listener, nil)
-	http.ListenAndServe(":8080", nil)
+
+	if noSocket {
+		http.ListenAndServe(":8080", nil)
+	} else {
+		http.Serve(listener, nil)
+	}
 }

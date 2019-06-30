@@ -1,0 +1,14 @@
+{
+  "priceBlack": 0.003,
+  "priceColor": 0.008,
+  "priceFuser": 0.002,
+  "priceSheet": 0.008,
+  "dsn": "postgres://gutenberg:password@localhost/gutenberg",
+  "maxFileSize": 20971520,
+  "hostDE": "localhost:8000",
+  "hostEN": "127.0.0.1:8000",
+  "tlsPrivKey": "/etc/ssl/gutenberg.stusta.mhn.de/private.key",
+  "tlsCert": "/etc/ssl/gutenberg.stusta.mhn.de/active/fullchainfile",
+  "officeHoursURL": "https://sprechstunden.stusta.mhn.de/appointments.json",
+  "officeHoursMaxAge": 10800
+}

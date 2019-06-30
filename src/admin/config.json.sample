@@ -1,0 +1,13 @@
+{
+  "printers": [
+    {
+      "name": "Hackerspace: Monster",
+      "host": "knecht.stusta.de",
+      "instance": "monster"
+    }
+  ],
+  "lpPath": "/usr/bin/lp",
+  "uploadPath": "/var/www/print/upload/",
+  "pruneUploads": 36288000,
+  "dsn": "postgres://gutenberg:password@localhost/gutenberg"
+}

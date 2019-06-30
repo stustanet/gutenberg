@@ -5,6 +5,8 @@ CREATE SEQUENCE job_id_seq;
 
 CREATE TYPE duplex_t AS ENUM('simplex', 'short', 'long');
 
+CREATE TYPE format_t AS ENUM('A5', 'A4', 'A3');
+
 CREATE TABLE if not exists job (
         id integer UNIQUE PRIMARY KEY DEFAULT NEXTVAL('job_id_seq'),
         file_id char(9) NOT NULL,
@@ -16,6 +18,7 @@ CREATE TABLE if not exists job (
         yellow DOUBLE PRECISION NOT NULL,
         key DOUBLE PRECISION NOT NULL,
         duplex duplex_t NOT NULL,
+        format format_t NOT NULL,
         pages SMALLINT NOT NULL,
         sheets SMALLINT NOT NULL,
         price DOUBLE PRECISION NOT NULL,
@@ -35,6 +38,7 @@ CREATE TABLE if not exists log (
         yellow DOUBLE PRECISION,
         key DOUBLE PRECISION,
         duplex duplex_t NOT NULL,
+        format format_t NOT NULL,
         pages SMALLINT NOT NULL,
         sheets SMALLINT NOT NULL,
         price DOUBLE PRECISION NOT NULL,

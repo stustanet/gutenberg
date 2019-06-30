@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var formats = []string {"A5", "A4", "A3"}
+
 type Job struct {
 	Pin      string
 	File     string
@@ -26,6 +28,7 @@ type Job struct {
 	Created  time.Time
 	Printed  time.Time
 	Err      error
+	Format   string // A5, A4, A3
 }
 
 type Log struct {
@@ -40,6 +43,7 @@ type Log struct {
 	Created  time.Time
 	Printed  time.Time
 	Err      error
+	Format   string // A5, A4, A3
 }
 
 type Coverage struct {
@@ -49,7 +53,7 @@ type Coverage struct {
 	Key     float64
 }
 
-func printJob(w io.Writer, j *Job) (err error) {
+func printJob(w io.Writer, j *Job, printer Printer, config *Config) (err error) {
 	// Simplex / Duplex option
 	var duplex string
 	switch j.Duplex {
@@ -71,7 +75,15 @@ func printJob(w io.Writer, j *Job) (err error) {
 	if n < 1 {
 		n = 1
 	}
-	cmd := exec.Command(lpPath, "-d", printer, "-n", strconv.Itoa(n), "-o", "Collate=True", "-o", color, "-o", duplex, uploadPath+j.File)
+	cmd := exec.Command(
+		config.LpPath,
+		"-H", printer.Host,
+		"-P", printer.Instance,
+		"-n", strconv.Itoa(n),
+		"-o", "Collate=True",
+		"-o", color,
+		"-o", duplex,
+		config.UploadPath+j.File)
 
 	// Pipe stdout
 	stdout, err := cmd.StdoutPipe()
