@@ -3,89 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <title>Print Jobs</title>
-  <link rel="stylesheet" href="/assets/css/admin.css">
+  <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
 </head>
 <body>
-<table>
-  <thead>
-  <tr>
-    <th>PIN</th>
-    <th>B/W</th>
-    <th>Duplex</th>
-    <th>Format</th>
-    <th>Pages</th>
-    <th>Sheets</th>
-    <th>Price</th>
-    <th>Copies</th>
-    <th>Total</th>
-    <th>Created</th>
-    <th>Printed</th>
-    <th>Error</th>
-    <th>Action</th>
-  </tr>
-  </thead>
-  <tbody>
-  {{range .Jobs}}
-    <tr>
-      <td>{{.Pin}}</td>
-      <td>{{checkmark .BW}}</td>
-      <td>{{.Duplex}}</td>
-      <td>{{.Format}}</td>
-      <td>{{.Pages}}</td>
-      <td>{{.Sheets}}</td>
-      <td>{{.Price}}</td>
-      <td>{{.Copies}}</td>
-      <td>{{.Total}}</td>
-      <td>{{.Created.Format "2006-01-02 15:04:05" }}</td>
-      <td>{{.Printed.Format "2006-01-02 15:04:05" }}</td>
-      <td>{{.Err }}</td>
-      <td>
-        <button class="print" onclick="openModal('{{.Pin}}', '{{.Price}}', '{{.Format}}')">
-          <img src="/assets/img/print.png" alt="Print"/>
-        </button>
-      </td>
-    </tr>
-  {{end}}
-  </tbody>
-</table>
-
-<div id="print-modal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <span class="modal-close">&times;</span>
-      <h2>Print Confirmation</h2>
-    </div>
-    <div class="modal-body">
-      <p>Pin: <span id="pin"></span></p>
-      <p>Price: <span id="price"></span>€</p>
-      <div>
-        <label id="label-printer" for="printer">Select Printer</label>
-        <select id="printer">
-            {{range .Printers}}
-              <option value="{{.Name}}">{{.Name}}</option>
-            {{end}}
-        </select>
-      </div>
-      <div>
-        <label id="label-format" for="format">Printing Format</label>
-        <select id="format">
-          {{range .FormatOptions}}
-            <option value="{{.}}">{{.}}</option>
-          {{end}}
-        </select>
-      </div>
-      <div>
-        <label id="label-internal" for="internal">Internal Print</label>
-        <input type="checkbox" id="internal">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-success" onclick="print()">Confirm</button>
+<div class="container-fluid">
+  <div class="row">
+    <div class="table-responsive">
+      <table id="job-table" class="table table-striped table-bordered table-hover">
+        <thead class="thead-light">
+        <tr>
+          <th scope="col">PIN</th>
+          <th scope="col">B/W</th>
+          <th scope="col">Duplex</th>
+          <th scope="col">Format</th>
+          <th scope="col">Pages</th>
+          <th scope="col">Sheets</th>
+          <th scope="col">Price</th>
+          <th scope="col">Copies</th>
+          <th scope="col">Total</th>
+          <th scope="col">Created</th>
+          <th scope="col">Error</th>
+          <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{range .Jobs}}
+          <tr>
+            <td>{{.Pin}}</td>
+            <td>{{checkmark .BW}}</td>
+            <td>{{.Duplex}}</td>
+            <td>{{.Format}}</td>
+            <td>{{.Pages}}</td>
+            <td>{{.Sheets}}</td>
+            <td>{{.Price}}</td>
+            <td>{{.Copies}}</td>
+            <td>{{.Total}}</td>
+            <td>{{.Created.Format "2006-01-02 15:04:05" }}</td>
+            <td>{{.Err }}</td>
+            <td>
+              <button class="btn btn-outline-success" onclick="openModal('{{.Pin}}', '{{.Price}}', '{{.Format}}')">
+                <img src="/assets/img/print.png" alt="Print"/>
+              </button>
+            </td>
+          </tr>
+        {{end}}
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 
+<div class="modal fade" id="modal-print" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Print Confirmation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="input-disabled-pin">Pin</label>
+            <input type="text" class="form-control" id="input-disabled-pin" value="" disabled readonly>
+          </div>
+          <div class="form-group">
+            <label for="input-disabled-price">Price</label>
+            <input type="text" class="form-control" id="input-disabled-price" value="" disabled readonly>
+          </div>
+          <div class="form-group">
+            <label for="input-printer">Printer</label>
+            <select class="form-control" id="input-printer">
+                {{range .Printers}}
+                  <option value="{{.Name}}">{{.Name}}</option>
+                {{end}}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="input-format">Format</label>
+            <select class="form-control" id="input-format">
+                {{range .FormatOptions}}
+                  <option value="{{.}}">{{.}}</option>
+                {{end}}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-check-label" for="input-internal">Internal Print</label>
+            <input class="form-check-inline" type="checkbox" id="input-internal">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-success" onclick="print()">Print</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/jquery/jquery-3.2.1.slim.min.js"></script>
+<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
 <script src="/assets/js/admin.js"></script>
 </body>
 </html>

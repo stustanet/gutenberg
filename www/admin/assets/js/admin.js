@@ -1,41 +1,37 @@
-(function() {
-  const modal = document.getElementById("print-modal");
-
-  const span = document.getElementsByClassName("modal-close")[0];
-
-  span.onclick = closeModal;
-
-  window.onclick = (event) => {
-    if (event.target === modal) {
-      closeModal();
-    }
-  };
-})();
+$(document).ready(function(){
+  $("#input-search").on("keyup", function() {
+    const value = $(this).val().toLowerCase();
+    $("#job-table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
 
 function openModal(pin, price, format) {
-  document.getElementById("pin").innerText = pin;
-  document.getElementById("price").innerText = price;
-  document.getElementById("format").value = format;
-  document.getElementById("print-modal").style.display = "block"
+  $("#input-disabled-pin").val(pin);
+  $("#input-disabled-price").val(price);
+  $("#input-format").val(format);
+
+  $('#modal-print').modal('show');
 }
 
 function closeModal() {
-  document.getElementById("print-modal").style.display = "none"
+  $('#modal-print').modal('hide');
 }
 
 function print() {
-  const pin = document.getElementById("pin").innerText;
-  const internal = document.getElementById("internal").checked;
-  const printer = document.getElementById("printer").value;
-  const format = document.getElementById("format").value;
+  const pin = $("#input-disabled-pin").val();
+  const internal = $("#input-internal").val();
+  const printer = $("#input-printer").val();
+  const format = $("#input-format").val();
 
-  const data = new FormData();
+  let data = new FormData();
   data.append('pin', pin);
   data.append('internal', internal);
   data.append('printer', printer);
   data.append('format', format);
 
-  // alert("Printing: " + pin + " Internal " + internal + " on printer " + printer);
+  alert("Printing: " + pin + " Internal " + internal + " on printer " + printer);
 
   const xhr = new XMLHttpRequest();
   xhr.open('POST', "/print", true);
