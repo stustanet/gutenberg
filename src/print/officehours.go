@@ -50,6 +50,34 @@ func NextOfficeHours(p *[]OfficeHour, done chan bool) {
 	done <- true
 }
 
+func IsHaspaOpen(open *bool, done chan bool) {
+	// Haspa current.json
+	resp, err := http.Get(config.HaspaStatusURL)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	// Parse JSON
+	var data struct {
+		State      string `json:"state"`
+		LastUpdate int64  `json:"last_update"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return
+	}
+
+	// Unix timestamps to time.Time
+
+	if data.State == "offen" {
+		*open = true
+	} else {
+		*open = false
+	}
+
+	done <- true
+}
+
 func updateOfficeHours() {
 	// Fetch appointments.json
 	resp, err := http.Get(config.OfficeHoursURL)

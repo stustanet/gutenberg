@@ -1,7 +1,7 @@
 $(document).ready(function(){
   $("#input-search").on("keyup", function() {
     const value = $(this).val().toLowerCase();
-    $("#job-table tr").filter(function() {
+    $("#job-table tbody tr").filter(function() {
       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
     });
   });
@@ -9,7 +9,7 @@ $(document).ready(function(){
 
 function openModal(pin, price, format) {
   $("#input-disabled-pin").val(pin);
-  $("#input-disabled-price").val(price);
+  $("#input-disabled-price").val(price + "€");
   $("#input-format").val(format);
 
   $('#modal-print').modal('show');

@@ -13,13 +13,13 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FO
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 (function() {
-    var dragover = false;
-    var selected = false;
-    var uf;
-    var file;
-    var fileinfo;
-    var filedrop;
-    var submit;
+    let dragover = false;
+    let selected = false;
+    let uf;
+    let file;
+    let fileinfo;
+    let filedrop;
+    let submit;
 
     // document.getElementById shortcut
     function $(id) {
@@ -27,8 +27,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
     }
 
     function radioValue(name) {
-        var radios = document.getElementsByName(name);
-        for (var i = 0, length = radios.length; i < length; i++) {
+        const radios = document.getElementsByName(name);
+        for (let i = 0, length = radios.length; i < length; i++) {
             if (radios[i].checked) {
                 return radios[i].value;
             }
@@ -54,18 +54,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         leave(e);
 
         // fetch FileList object
-        var files = e.target.files || e.dataTransfer.files;
+        const files = e.target.files || e.dataTransfer.files;
         uf = files[0];
-        var type = uf.type;
-        if (type == "application/x-pdf" || type == "text/pdf") {
+        let type = uf.type;
+        if (type === "application/x-pdf" || type === "text/pdf") {
             type = "application/pdf";
-        } else if (type == "application/save-as" || type == "application/x-save-as") {
-            if (uf.name.toLowerCase().substr(uf.name.lastIndexOf('.') + 1) == "pdf") {
+        } else if (type === "application/save-as" || type === "application/x-save-as") {
+            if (uf.name.toLowerCase().substr(uf.name.lastIndexOf('.') + 1) === "pdf") {
                 type = "application/pdf";
             }
         }
 
-        if (type != "application/pdf") {
+        if (type !== "application/pdf") {
             alert(errFileType);
             uf = undefined;
             return;
@@ -90,7 +90,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
     function send() {
         document.body.className = "progress";
         submit.disabled = false;
-        var fd = new FormData();
+        let fd = new FormData();
         fd.append("file", uf, uf.name);
         if ($("bw").checked) {
             fd.append("bw", $("bw").value);
@@ -98,7 +98,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
         fd.append("duplex", radioValue("duplex"));
         fd.append("copies", $("copies").value);
 
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open('POST', upload.action, true);
 
         /*xhr.upload.onprogress = function(e) {
@@ -111,7 +111,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
             $("result").innerHTML = xhr.response;
         };*/
         xhr.onload = function() {
-            if (this.status == 200) {
+            if (this.status === 200) {
                 $("result-content").innerHTML = xhr.response;
                 document.body.className = "result";
             } else {

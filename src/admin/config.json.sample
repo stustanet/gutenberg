@@ -3,7 +3,8 @@
     {
       "name": "Hackerspace: Monster",
       "host": "knecht.stusta.de",
-      "instance": "monster"
+      "instance": "monster",
+      "optionsA3": ["InputSlot=PF730B"]
     }
   ],
   "lpPath": "/usr/bin/lp",

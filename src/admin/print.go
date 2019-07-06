@@ -10,7 +10,10 @@ import (
 	"time"
 )
 
-var formats = []string {"A5", "A4", "A3"}
+var formatA5 = "A5"
+var formatA4 = "A4"
+var formatA3 = "A3"
+var formats = []string {formatA5, formatA4, formatA3}
 
 type Job struct {
 	Pin      string
@@ -53,7 +56,7 @@ type Coverage struct {
 	Key     float64
 }
 
-func printJob(w io.Writer, j *Job, printer Printer, config *Config) (err error) {
+func printJob(w io.Writer, j *Job, printer *Printer, config *Config) (err error) {
 	// Simplex / Duplex option
 	var duplex string
 	switch j.Duplex {
@@ -75,15 +78,36 @@ func printJob(w io.Writer, j *Job, printer Printer, config *Config) (err error) 
 	if n < 1 {
 		n = 1
 	}
-	cmd := exec.Command(
-		config.LpPath,
+
+	args := []string {
 		"-H", printer.Host,
 		"-P", printer.Instance,
 		"-n", strconv.Itoa(n),
 		"-o", "Collate=True",
 		"-o", color,
-		"-o", duplex,
-		config.UploadPath+j.File)
+		"-o", duplex}
+
+	// Paper formats
+	switch j.Format {
+	case formatA5:
+		for _, option := range printer.OptionsA5 {
+			args = append(args, "-o", option)
+		}
+	case formatA4:
+		for _, option := range printer.OptionsA4 {
+			args = append(args, "-o", option)
+		}
+	case formatA3:
+		for _, option := range printer.OptionsA3 {
+			args = append(args, "-o", option)
+		}
+	default:
+		err = errors.New("invalid format specified")
+		return
+	}
+
+	args = append(args, config.UploadPath+j.File)
+	cmd := exec.Command(config.LpPath, args...)
 
 	// Pipe stdout
 	stdout, err := cmd.StdoutPipe()

@@ -94,7 +94,7 @@ func print(w http.ResponseWriter, r *http.Request) {
 	job.Internal = r.FormValue("internal") == "true"
 
 	format := r.FormValue("format")
-	if format == "A5" || format == "A4" || format == "A3" {
+	if format == formatA5 || format == formatA4 || format == formatA3 {
 		job.Format = format
 	} else {
 		http.Error(w, "Invalid FOrmat", http.StatusBadRequest)
@@ -102,12 +102,12 @@ func print(w http.ResponseWriter, r *http.Request) {
 	}
 
 	printerName := r.FormValue("printer")
-	var printer Printer
+	var printer *Printer
 	validPrinter := false
 	for _, p := range config.Printers {
 		if p.Name == printerName {
 			validPrinter = true
-			printer = p
+			printer = &p
 		}
 	}
 
@@ -124,12 +124,11 @@ func print(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	noSocket := *flag.Bool("no-socket", true, "Do not run as a socket")
+	noSocket := flag.Bool("no-socket", false, "Do not run as a socket")
 	flag.Parse()
 
 	//config = getConfig("/etc/ssn/gutenberg/admin-config.json")
 	config, _ = getConfig("../../src/admin/config.json")
-	fmt.Println(config)
 
 	tmpl = template.Must(template.New("main").Funcs(template.FuncMap{
 		"checkmark": func(value bool) template.HTML {
@@ -145,7 +144,7 @@ func main() {
 
 	var listener net.Listener
 
-	if !noSocket {
+	if !*noSocket {
 		var err error
 		listener, err = listenSocket()
 		if err != nil {
@@ -162,7 +161,7 @@ func main() {
 	http.HandleFunc("/print", print)
 	http.HandleFunc("/", index)
 
-	if noSocket {
+	if *noSocket {
 		http.ListenAndServe(":8080", nil)
 	} else {
 		http.Serve(listener, nil)

@@ -323,13 +323,12 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 }
 
 func main() {
-	noSocket := *flag.Bool("no-socket", true, "Do not run under a socket.")
+	noSocket := flag.Bool("no-socket", false, "Do not run under a socket.")
 	flag.Parse()
 
 	// TODO: passable config file
 	//config = getConfig("/etc/ssn/gutenberg/admin-config.json")
 	config, _ = getConfig("../../src/print/config.json")
-	fmt.Println(config)
 
 	connectDB(config.Dsn)
 
@@ -337,7 +336,7 @@ func main() {
 	var httpListener net.Listener
 	var httpsListener net.Listener
 
-	if !noSocket {
+	if !*noSocket {
 		sockets, err := systemd.ListenWithNames()
 		if err != nil {
 			panic(err)
@@ -378,7 +377,7 @@ func main() {
 	})
 	http.HandleFunc("/", index)
 
-	if noSocket {
+	if *noSocket {
 		http.ListenAndServe(":8000", nil)
 	} else {
 		http.ServeTLS(httpsListener, nil, config.TlsCert, config.TlsPrivKey)
