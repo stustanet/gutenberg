@@ -16,9 +16,18 @@
     <a href="/"><h1><img src="/assets/img/logo.png" alt="StuStaNet e.V."/>Druckerservice</h1></a>
     <a href="http://print.stusta.de" class="language-link">English</a>
   </header>
-  <section id="info">
-    <span class="loader loader-bars"><span> </span></span>
-    <h4>Abholzeiten werden geladen...</h4>
+  <section id="info" class="info-open">
+    <div>
+        {{if not .HaspaOpen}}
+          <h1>Abholung momentan im Hackerspace möglich</h1>
+          <p>
+            Der Hackerspace befindet sich im 3. Stock in Haus 10.
+          </p>
+        {{else}}
+          <h1>Abholung zu den normalen Sprechstundenzeiten möglich</h1>
+        {{end}}
+      </p>
+    </div>
   </section>
   <section id="main">{{if .Main}}
       <aside>
@@ -84,8 +93,8 @@
   <section id="progress">
       {{with .Error}}{{.}}
       {{else}}
-      <span class="loader loader-bars"><span> </span></span>
-      <h3>Preis wird berechnet...</h3>
+        <span class="loader loader-bars"><span> </span></span>
+        <h3>Preis wird berechnet...</h3>
       {{end}}
   </section>
   <section id="result">

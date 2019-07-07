@@ -11,6 +11,7 @@
   "tlsPrivKey": "/etc/ssl/gutenberg.stusta.mhn.de/private.key",
   "tlsCert": "/etc/ssl/gutenberg.stusta.mhn.de/active/fullchainfile",
   "haspaStatusURL": "https://hackerspace.stusta.de/current.json",
+  "haspaStatusMaxAge": 10800,
   "officeHoursURL": "https://sprechstunden.stusta.mhn.de/appointments.json",
   "officeHoursMaxAge": 10800
 }

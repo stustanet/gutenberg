@@ -25,6 +25,7 @@ header h1, section, footer {
 header {
 	height: 50px;
 	background: #EEE;
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
 }
 
 header a {
@@ -76,6 +77,21 @@ fieldset {
 legend {
 	font-weight: bold;
 	color: #333;
+}
+
+#info {
+	width: 100%;
+	text-align: center;
+}
+
+#info h1 {
+	padding-top: 5px;
+	margin: 0;
+}
+
+.info-open {
+	background-color: #17a2b8;
+	color: #fff;
 }
 
 .info {

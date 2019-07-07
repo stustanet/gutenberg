@@ -12,6 +12,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+const haspaStatusURL = 'http://hackerspace.stusta.de/current.json';
+
 (function() {
     let dragover = false;
     let selected = false;
@@ -33,6 +35,20 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
                 return radios[i].value;
             }
         }
+    }
+
+    function fetchOpeningHours() {
+        // not working because of no cors
+        const xhr =  new XMLHttpRequest();
+        xhr.open('GET', haspaStatusURL, true);
+        xhr.onload = function() {
+            if (this.status === 200) {
+                alert("Haspa status " + xhr.response);
+            } else {
+                alert("Haspa fail " + xhr.response);
+            }
+        };
+        xhr.send()
     }
 
     function over(e) {

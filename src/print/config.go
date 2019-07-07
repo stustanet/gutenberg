@@ -27,7 +27,8 @@ type Config struct {
 	TlsPrivKey string `json:"tlsPrivKey"`
 	TlsCert    string `json:"tlsCert"`
 	// Hackerspace status URL
-	HaspaStatusURL string `json:"haspaStatusURL"`
+	HaspaStatusURL    string `json:"haspaStatusURL"`
+	HaspaStatusMaxAge int    `json:"haspaStatusMaxAge"`
 	// Office Hours JSON URL
 	OfficeHoursURL string `json:"officeHoursURL"`
 	// max age in seconds

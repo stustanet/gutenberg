@@ -16,6 +16,9 @@ var (
 	officeHoursCache  []OfficeHour
 	officeHoursUpdate time.Time
 	officeHoursMu     sync.RWMutex
+	haspaStatusCache  bool
+	haspaStatusUpdate time.Time
+	haspaStatusMu     sync.RWMutex
 )
 
 // Saves the office hours to the given pointer and signals through chan done
@@ -51,6 +54,35 @@ func NextOfficeHours(p *[]OfficeHour, done chan bool) {
 }
 
 func IsHaspaOpen(open *bool, done chan bool) {
+	haspaStatusMu.RLock()
+	if int(time.Since(haspaStatusUpdate)) < config.HaspaStatusMaxAge {
+		*open = haspaStatusCache
+		haspaStatusMu.RUnlock()
+		done <- true
+		return
+	}
+
+	// Cache is outdated. Update...
+	haspaStatusMu.RUnlock()
+	haspaStatusMu.Lock()
+
+	// Rule #2: Always double tap.
+	// The cache might have changed while we waited for the lock
+	if int(time.Since(haspaStatusUpdate)) < config.HaspaStatusMaxAge {
+		*open = haspaStatusCache
+		haspaStatusMu.Unlock()
+		done <- true
+		return
+	}
+
+	updateHaspaStatus()
+
+	*open = haspaStatusCache
+	haspaStatusMu.Unlock()
+	done <- true
+}
+
+func updateHaspaStatus() {
 	// Haspa current.json
 	resp, err := http.Get(config.HaspaStatusURL)
 	if err != nil {
@@ -67,15 +99,7 @@ func IsHaspaOpen(open *bool, done chan bool) {
 		return
 	}
 
-	// Unix timestamps to time.Time
-
-	if data.State == "offen" {
-		*open = true
-	} else {
-		*open = false
-	}
-
-	done <- true
+	haspaStatusCache = data.State == "offen"
 }
 
 func updateOfficeHours() {

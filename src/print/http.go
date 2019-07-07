@@ -55,15 +55,21 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var haspaOpen bool
+	haspaDone := make(chan bool)
+	go IsHaspaOpen(&haspaOpen, haspaDone)
+	<-haspaDone
+
 	// config and content for the main template
 	data := struct {
 		Code          int
 		Class         string
 		Main          bool
+		HaspaOpen     bool
 		MaxFileSize   uint
 		Error         string
 		ResultContent template.HTML
-	}{Code: 200, Main: true, MaxFileSize: uint(config.MaxFileSize)}
+	}{Code: 200, Main: true, MaxFileSize: uint(config.MaxFileSize), HaspaOpen: haspaOpen}
 
 	// DO NOT CHANGE THE ORDER!
 	// we use fallthrough here!
@@ -167,7 +173,6 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 	default:
 		return http.StatusBadRequest
 	}
-
 
 	switch r.FormValue("duplex") {
 	case "no":
