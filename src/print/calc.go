@@ -26,7 +26,7 @@ type Job struct {
 	CMYK     Coverage // ink coverage
 	PIN      int      // print job PIN (generated)
 	Duplex   int8
-	Format   string   // A5, A4, A3
+	Format   string // A5, A4, A3
 	BW       bool
 	Pages    int
 	Sheets   int
@@ -173,28 +173,18 @@ func pdfPkpgcounter(j *Job) {
 		//      "-r150",
 		j.File,
 	)
-	stdout, err := cmd.StdoutPipe()
+	out, err := cmd.Output()
 	if err != nil {
 		j.Err = err
 		return
 	}
-	if err = cmd.Start(); err != nil {
-		j.Err = err
-		return
-	}
+
 	num := 0
-	rdr := bufio.NewReader(stdout)
+
 	var sum Coverage
-	for {
-		var line []byte
-		line, _, err = rdr.ReadLine()
-		if err != nil {
-			if err != io.EOF {
-				j.Err = err
-				return
-			}
-			break
-		}
+	scanner := bufio.NewScanner(strings.NewReader(string(out)))
+	for scanner.Scan() {
+		line := scanner.Text()
 		num++
 
 		var c Coverage
@@ -215,16 +205,9 @@ func pdfPkpgcounter(j *Job) {
 		}
 
 		sum.Key += c.Key
-
-		//c.print(w, num)
-		//flush()
 	}
+
 	j.CMYK = sum
-
-	if err = cmd.Wait(); err != nil {
-		j.Err = err
-		return
-	}
 
 	// calculation run time
 	j.Runtime = time.Since(start)
@@ -242,10 +225,13 @@ func pdfPkpgcounter(j *Job) {
 }
 
 /*
-func pdfPrice(w io.Writer, flush func(), filename, password string) (price float64, err error) {
-	var sum coverage
-
-	start := time.Now()
+func pdfPrice(job *Job) (err error){
+	var sum Coverage
+	// colorspace arg
+	cs := "-cCMYK"
+	if job.BW {
+		cs = "-sColorConversionStrategy=Gray"
+	}
 
 	// See http://www.guug.de/uptimes/2013-2/uptimes_2013-02.pdf
 	// lower resolution => higher price, faster calculation
@@ -254,11 +240,10 @@ func pdfPrice(w io.Writer, flush func(), filename, password string) (price float
 		"-o",
 		"-",
 		"-sDEVICE=inkcov",
-		//      "-sColorConversionStrategy=Gray",
 		//      "-dProcessColorModel=/DeviceGray",
 		"-r150",
-		"-sPDFPassword="+password,
-		filename,
+		"-sPDFPassword="+job.Password,
+		job.File,
 	)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -280,25 +265,26 @@ func pdfPrice(w io.Writer, flush func(), filename, password string) (price float
 		}
 		num++
 
-		var c coverage
+		var c Coverage
 		if c, err = inkCover(line); err != nil {
 			return
 		}
 
-		sum.cyan += c.cyan
-		sum.magenta += c.magenta
-		sum.yellow += c.yellow
-		sum.key += c.key
-
-		c.print(w, num)
-		flush()
+		sum.Cyan += c.Cyan / float64(job.Pages)
+		sum.Magenta += c.Magenta / float64(job.Pages)
+		sum.Yellow += c.Yellow / float64(job.Pages)
+		sum.Key += c.Key / float64(job.Pages)
 	}
 	if err = cmd.Wait(); err != nil {
 		return
 	}
 
-	elapsed := time.Since(start)
-	fmt.Fprintf(w, "Time elapsed: %s \n", elapsed)
+	job.CMYK = sum
+
+	j.Price = sum.Price() + // ink
+		(float64(num) * config.PriceFuser) + // fuser
+		(float64(j.Sheets) * config.PriceSheet) // paper
+	j.Total = j.Price * float64(j.Copies)
 
 	return
 }*/
@@ -332,9 +318,9 @@ func inkCover(line []byte) (c Coverage, err error) {
 	return c, ErrInvalidFormat
 }
 
-func inkCoverBW(line []byte) (c Coverage, err error) {
+func inkCoverBW(line string) (c Coverage, err error) {
 	// Format: "B :   7.422240%"
-	if len(line) == 15 && bytes.Compare(line[:4], []byte("B : ")) == 0 {
+	if len(line) == 15 && strings.Compare(line[:4], "B : ") == 0 {
 		c.Key, err = strconv.ParseFloat(
 			strings.TrimLeft(string(line[4:14]), " "),
 			64,
@@ -345,9 +331,9 @@ func inkCoverBW(line []byte) (c Coverage, err error) {
 	return c, ErrInvalidFormat
 }
 
-func inkCoverCMYK(line []byte) (c Coverage, err error) {
+func inkCoverCMYK(line string) (c Coverage, err error) {
 	// Format: "C :   0.507586%      M :   0.594638%      Y :   0.990822%      K :   6.804527%"
-	if len(line) == 78 && bytes.Compare(line[:4], []byte("C : ")) == 0 {
+	if len(line) == 78 && strings.Compare(line[:4], "C : ") == 0 {
 		c.Cyan, err = strconv.ParseFloat(
 			strings.TrimLeft(string(line[4:14]), " "),
 			64,

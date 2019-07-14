@@ -13,7 +13,7 @@ import (
 var formatA5 = "A5"
 var formatA4 = "A4"
 var formatA3 = "A3"
-var formats = []string {formatA5, formatA4, formatA3}
+var formats = []string{formatA5, formatA4, formatA3}
 
 type Job struct {
 	Pin      string
@@ -79,10 +79,10 @@ func printJob(w io.Writer, j *Job, printer *Printer, config *Config) (err error)
 		n = 1
 	}
 
-	args := []string {
+	args := []string{
 		"-H", printer.Host,
 		"-P", printer.Instance,
-		"-n", strconv.Itoa(n),
+		"-#", strconv.Itoa(n),
 		"-o", "Collate=True",
 		"-o", color,
 		"-o", duplex}
@@ -107,6 +107,7 @@ func printJob(w io.Writer, j *Job, printer *Printer, config *Config) (err error)
 	}
 
 	args = append(args, config.UploadPath+j.File)
+	fmt.Println("Printing with args:", args)
 	cmd := exec.Command(config.LpPath, args...)
 
 	// Pipe stdout
@@ -127,7 +128,7 @@ func printJob(w io.Writer, j *Job, printer *Printer, config *Config) (err error)
 	}
 
 	// Read stdout from pipe
-	out, err := ioutil.ReadAll(stdout)
+	_, err = ioutil.ReadAll(stdout)
 	if err != nil {
 		return
 	}
@@ -148,9 +149,9 @@ func printJob(w io.Writer, j *Job, printer *Printer, config *Config) (err error)
 
 	// Save print job to log
 	if err1 := saveLog(j); err1 != nil {
-		fmt.Fprintln(w, err1.Error())
+		err = err1
+		return
 	}
 
-	fmt.Fprintln(w, string(out))
 	return
 }

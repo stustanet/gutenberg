@@ -15,9 +15,9 @@ type Config struct {
 }
 
 type Printer struct {
-	Name     string `json:"name"`
-	Host     string `json:"address"`
-	Instance string `json:"instance"`
+	Name      string   `json:"name"`
+	Host      string   `json:"host"`
+	Instance  string   `json:"instance"`
 	OptionsA5 []string `json:"optionsA5"`
 	OptionsA4 []string `json:"optionsA4"`
 	OptionsA3 []string `json:"optionsA3"`

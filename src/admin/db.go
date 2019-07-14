@@ -122,11 +122,16 @@ func getJob(pin string) (*Job, error) {
 }
 
 func saveLog(j *Job) (err error) {
-	_, err = db.Exec(
-		"INSERT INTO log (internal, bw, cyan, magenta, yellow, key, duplex, format, pages, sheets, price, copies, create_date, print_date, error) "+
-			"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
-		j.Internal, j.BW, j.CMYK.Cyan, j.CMYK.Magenta, j.CMYK.Yellow, j.CMYK.Key, j.Duplex, j.Format, j.Pages, j.Sheets, j.Price, j.Copies, j.Created, j.Printed, j.Err.Error(),
-	)
+	error := ""
+	if j.Err != nil {
+		error = j.Err.Error()
+	} else {
+		_, err = db.Exec(
+			"INSERT INTO log (internal, bw, cyan, magenta, yellow, key, duplex, format, pages, sheets, price, copies, create_date, print_date, error) "+
+				"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
+			j.Internal, j.BW, j.CMYK.Cyan, j.CMYK.Magenta, j.CMYK.Yellow, j.CMYK.Key, j.Duplex, j.Format, j.Pages, j.Sheets, j.Price, j.Copies, j.Created, j.Printed, error,
+		)
+	}
 	return
 }
 

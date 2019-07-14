@@ -2,55 +2,61 @@
 
 <h3>Fileinfo:</h3>
 <table>
-<tr>
-<th>Filename:</th>
-<td>{{.Job.Name}}</td>
-</tr>
-<tr>
-<th>Pages:</th>
-<td>{{.Job.Pages}}</td>
-</tr>
+  <tr>
+    <th>Filename:</th>
+    <td>{{.Job.Name}}</td>
+  </tr>
+  <tr>
+    <th>Pages:</th>
+    <td>{{.Job.Pages}}</td>
+  </tr>
 </table>
 
 <h3>Settings:</h3>
 <table>
-<tr>
-<th>Color:</th>
-<td>{{if .Job.BW}}No{{else}}Yes{{end}}</td>
-</tr>
-<tr>
-<th>Duplex:</th>
-<td>{{if .Job.Duplex}}{{if eq .Job.Duplex 1}}Long Edge{{else}}Short Edge{{end}}{{else}}No{{end}}</td>
-</tr>
-<tr>
-<th>Copies:</th>
-<td>{{.Job.Copies}}</td>
-</tr>
+  <tr>
+    <th>Color:</th>
+    <td>{{if .Job.BW}}No{{else}}Yes{{end}}</td>
+  </tr>
+  <tr>
+    <th>Duplex:</th>
+    <td>{{if .Job.Duplex}}{{if eq .Job.Duplex 1}}Long Edge{{else}}Short Edge{{end}}{{else}}No{{end}}</td>
+  </tr>
+  <tr>
+    <th>Copies:</th>
+    <td>{{.Job.Copies}}</td>
+  </tr>
 </table>
 
 <h3>Printinfo:</h3>
 <table id="printinfo">
-<!--<tr>
+  <!--<tr>
 <th>Sheets:</th>
 <td>{{.Job.Sheets}}</td>
 </tr>-->
-<tr>
-<th>Price:</th>
-<td class="big">{{printf "%.02f" .Job.Total}} &euro;</td>
-<td rowspan="2"><div class="info">Please note the PIN!<br />It is necessary for printing!</div></td>
-</tr>
-<tr>
-<th>PIN:</th>
-<td class="big">{{.Job.PIN}}</td>
-</tr>
+  <tr>
+    <th>Price:</th>
+    <td class="big">{{printf "%.02f" .Job.Total}} &euro;</td>
+    <td rowspan="2">
+      <div class="info">Please note the PIN!<br/>It is necessary for printing!</div>
+    </td>
+  </tr>
+  <tr>
+    <th>PIN:</th>
+    <td class="big">{{.Job.PIN}}</td>
+  </tr>
 </table>
 
 {{with .OfficeHours}}
-<h3>Next Office Hours</h3>
-<table id="officehours">
-{{range .}}
-<tr><td>{{.WeekDay}},</td><td>{{.Day}}. {{.Month}}</td><td>{{.TimeStart}} - {{.TimeEnd}}</td></tr>
-{{end}}
-</table>
+  <h3>Next Office Hours</h3>
+  <table id="officehours">
+      {{range .}}
+        <tr>
+          <td>{{.WeekDay}},</td>
+          <td>{{.Day}}. {{.Month}}</td>
+          <td>{{.TimeStart}} - {{.TimeEnd}}</td>
+        </tr>
+      {{end}}
+  </table>
 {{end}}
 

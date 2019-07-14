@@ -16,24 +16,23 @@
     <a href="/"><h1><img src="/assets/img/logo.png" alt="StuStaNet e.V."/>Druckerservice</h1></a>
     <a href="http://print.stusta.de" class="language-link">English</a>
   </header>
-  <section id="info" class="info-open">
-    <div>
-        {{if not .HaspaOpen}}
-          <h1>Abholung momentan im Hackerspace möglich</h1>
-          <p>
-            Der Hackerspace befindet sich im 3. Stock in Haus 10.
-          </p>
-        {{else}}
-          <h1>Abholung zu den normalen Sprechstundenzeiten möglich</h1>
-        {{end}}
-      </p>
-    </div>
-  </section>
+  {{if .HaspaOpen}}
+    <section id="info" class="info-open">
+      <div>
+        <h1>Abholung momentan im Hackerspace möglich</h1>
+        <p>
+          Der Hackerspace befindet sich im 3. Stock in Haus 10.
+        </p>
+        </p>
+      </div>
+    </section>
+  {{end}}
   <section id="main">{{if .Main}}
       <aside>
         <h2>Willkommen beim StuStaNet e.V. Printer Webinterface.</h2>
-        <p>Hier kannst du deine Dateien hochladen, um sie dann im Sprechstundenraum ausdrucken zu lassen. Nach dem
-          Hochladen wird dir der Preis angezeigt.
+        <p>Hier kannst du deine Dateien hochladen, um sie dann im Sprechstundenraum oder im Hackerspace ausdrucken zu lassen.
+          Der Hackerspace ist meistens täglich ab ca. 19-20h offen.
+          <br/>Nach dem Hochladen wird dir der Preis angezeigt.
           <br/> Das Dokument muss eine PDF Datei sein.
           <br/> Nicht abgeholte Druckauftr&auml;ge werden nach 7 Tagen automatisch gel&ouml;scht.</p>
       </aside>
@@ -105,8 +104,8 @@
 <footer><a href="https://stustanet.de/de/impressum/" target="_blank">Impressum</a> | Bei Fragen oder Problemen wende
   dich an <a href="mailto:admins@stusta.de">admins@stusta.de</a></footer>
 <script type="text/javascript">
-    var errFileType = "Nur PDF-Dateien sind erlaubt!",
-        errFileSize = unescape("PDF-Datei ist zu gro%3F!");
+  var errFileType = "Nur PDF-Dateien sind erlaubt!",
+    errFileSize = unescape("PDF-Datei ist zu gro%3F!");
 </script>
 <script src="assets/js/main.js"></script>
 </body>

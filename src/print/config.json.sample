@@ -6,12 +6,12 @@
   "dsn": "postgres://gutenberg:password@localhost/gutenberg",
   "uploadPath": "/var/www/print/upload/",
   "maxFileSize": 20971520,
-  "hostDE": "localhost:8000",
-  "hostEN": "127.0.0.1:8000",
+  "hostDE": "drucken.stusta.de",
+  "hostEN": "print.stusta.de",
   "tlsPrivKey": "/etc/ssl/gutenberg.stusta.mhn.de/private.key",
   "tlsCert": "/etc/ssl/gutenberg.stusta.mhn.de/active/fullchainfile",
   "haspaStatusURL": "https://hackerspace.stusta.de/current.json",
-  "haspaStatusMaxAge": 10800,
+  "haspaStatusMaxAge": 60, // seconds
   "officeHoursURL": "https://sprechstunden.stusta.mhn.de/appointments.json",
-  "officeHoursMaxAge": 10800
+  "officeHoursMaxAge": 10800 // seconds
 }

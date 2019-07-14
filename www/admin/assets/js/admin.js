@@ -31,8 +31,6 @@ function print() {
   data.append('printer', printer);
   data.append('format', format);
 
-  alert("Printing: " + pin + " Internal " + internal + " on printer " + printer);
-
   const xhr = new XMLHttpRequest();
   xhr.open('POST', "/print", true);
   xhr.onload = function () {

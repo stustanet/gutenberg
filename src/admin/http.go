@@ -47,12 +47,12 @@ func detail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func index(w http.ResponseWriter, r *http.Request) {
+func jobs(w http.ResponseWriter, r *http.Request) {
 	jobs, err := listJobs()
 
 	type Data struct {
-		Jobs     []Job
-		Printers []Printer
+		Jobs          []Job
+		Printers      []Printer
 		FormatOptions []string
 	}
 
@@ -61,6 +61,52 @@ func index(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.ExecuteTemplate(w, "job_list.html", data)
 	if err != nil {
 		fmt.Print(err)
+	}
+}
+
+func index(w http.ResponseWriter, r *http.Request) {
+	type Data struct {
+		Job           Job
+		Printers      []Printer
+		FormatOptions []string
+		Result        bool
+		Err           error
+	}
+
+	data := Data{}
+
+	if r.Method == "GET" {
+		data.Result = false
+
+		err := tmpl.ExecuteTemplate(w, "job_lookup.html", data)
+		if err != nil {
+			fmt.Print(err)
+		}
+	} else if r.Method == "POST" {
+		data.Result = true
+		pin := r.FormValue("pin")
+		if len(pin) < 1 {
+			http.Error(w, "Job PIN missing", http.StatusBadRequest)
+			return
+		}
+
+		job, err := getJob(pin)
+		if err != nil {
+			err = errors.New("Job not found for PIN " + pin)
+		} else {
+			data.Job = *job
+			fmt.Println(job.Pin, job.Price)
+			data.Printers = config.Printers
+			data.FormatOptions = formats
+
+			err = tmpl.ExecuteTemplate(w, "job_lookup.html", data)
+			if err != nil {
+				fmt.Print(err)
+			}
+		}
+	} else {
+		http.Error(w, "NOPE", http.StatusMethodNotAllowed)
+		return
 	}
 }
 
@@ -120,6 +166,8 @@ func print(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error:", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	} else {
+		_, _ = fmt.Fprintf(w, "Printed successfully")
 	}
 }
 
@@ -157,8 +205,9 @@ func main() {
 		http.ServeFile(w, r, "favicon.ico")
 	})
 	http.HandleFunc("/detail", detail)
-	http.HandleFunc("/log", logs)
+	http.HandleFunc("/logs", logs)
 	http.HandleFunc("/print", print)
+	http.HandleFunc("/jobs", jobs)
 	http.HandleFunc("/", index)
 
 	if *noSocket {

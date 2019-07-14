@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lookup Job</title>
+  <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets//css/admin.css">
+</head>
+<body>
+<div class="container-fluid">
+  <div id="header" class="row pt-3 justify-content-md-center">
+    <h3>StuStaNet Print Admin</h3>
+  </div>
+  <div class="row pt-3 justify-content-md-center">
+    <div class="col-sm-12 col-md-6 col-lg-4">
+      {{if not .Result}}
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Print File</h5>
+          </div>
+          <div class="card-body">
+            <form action="/" method="post">
+              <div class="card-text">
+                <div class="form-group">
+                  <label for="pin">Enter PIN</label>
+                  <input type="text" class="form-control" id="pin" name='pin' placeholder="...">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary float-right">Submit</button>
+            </form>
+          </div>
+        </div>
+      {{else}}
+        {{if .Err}}
+          <div class="alert alert-danger" role="alert">
+              {{.Err}}
+          </div>
+        {{else}}
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title">Print File</h5>
+            </div>
+            <div class="card-body">
+              <form>
+                {{with .Job}}
+                <div class="form-group">
+                  <label for="input-disabled-pin">Pin</label>
+                  <input type="text" class="form-control" id="input-disabled-pin" value="{{.Pin}}" disabled
+                         readonly>
+                </div>
+                <div class="form-group">
+                  <label for="input-disabled-price">Price</label>
+                  <input type="text" class="form-control" id="input-disabled-price" value="{{.Price}}" disabled
+                         readonly>
+                </div>
+                {{end}}
+                <div class="form-group">
+                  <label for="input-printer">Printer</label>
+                  <select class="form-control" id="input-printer">
+                    {{range .Printers}}
+                      <option value="{{.Name}}">{{.Name}}</option>
+                    {{end}}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="input-format">Format</label>
+                  <select class="form-control" id="input-format">
+                    {{range .FormatOptions}}
+                      <option value="{{.}}" {{if eq $.Job.Format .}}selected{{end}}>{{.}}</option>
+                    {{end}}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-check-label" for="input-internal">Internal Print</label>
+                  <input class="form-check-inline" type="checkbox" id="input-internal">
+                </div>
+              </form>
+            </div>
+            <div class="card-footer">
+              <button type="button" class="btn btn-outline-success float-right" onclick="print()">Print</button>
+            </div>
+          </div>
+        {{end}}
+      {{end}}
+    </div>
+  </div>
+</div>
+
+<script src="/assets/jquery/jquery-3.2.1.slim.min.js"></script>
+<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="/assets/js/admin.js"></script>
+</body>
+</html>

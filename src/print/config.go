@@ -45,6 +45,7 @@ func getConfig(configFile string) (config *Config, err error) {
 	err = json.Unmarshal([]byte(file), config)
 
 	// correct times such that config.json uses seconds, but go uses nanoseconds
+	config.HaspaStatusMaxAge = config.HaspaStatusMaxAge * int(time.Second)
 	config.OfficeHoursMaxAge = config.OfficeHoursMaxAge * int(time.Second)
 
 	return config, err

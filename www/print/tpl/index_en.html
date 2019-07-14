@@ -1,94 +1,109 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <title>Printerinterface | StuStaNet e.V.</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/assets/css/main.css">
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-        <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    </head>
-    <body class="no-js{{with .ResultContent}} result{{else}}{{with .Error}} error{{end}}{{end}}">
-        <div id="container">
-            <header class="relative">
-		<a href="/"><h1><img src="/assets/img/logo.png" alt="StuStaNet e.V." />Print Service</h1></a>
-		<a href="http://drucken.stusta.de" class="language-link">Deutsch</a>
-	    </header>
-            <section id="main">{{if .Main}}
-                <aside>
-                    <h2>Welcome to the StuStaNet e.V. Printer Webinterface.</h2>
-                    <p>Here, you can upload your files and print them later during our office hour.
-                        <br /> The price is shown after the upload.
-                        <br /> The document must be a PDF file.
-                        <br /> Uncollected print jobs will be automatically deleted after 7 days.</p>
-                </aside>
-                <form id="upload" action="/" method="POST" enctype="multipart/form-data">
-                    <fieldset id="step1">
-                        <legend>1. Select PDF-File</legend>
-                        <div class="info">
-                            <a href="https://wiki.stusta.mhn.de/Print#Printing_other_file_types" target="_blank">How can other file types be printed?</a>
-                            <br />
-                            <a href="https://wiki.stusta.mhn.de/Print#Print_multiple_pages_on_one_sheet" target="_blank">How can multiple pages be printed on one sheet?</a>
-                            <br />
-                        </div>
-                        <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="{{.MaxFileSize}}" />
-                        <div id="filedrop">
-                            <div id="fileinfo"></div>
-                            <p>Drag file here</p>
-                            <label for="file">Or click to select a file</label>
-                        </div>
-                        <input type="file" id="file" name="file" accept=".pdf" />
-                    </fieldset>
-                    <fieldset id="step2">
-                        <legend>2. Print Options</legend>
-                        <table id="settings">
-                            <tr>
-                                <th>Black/White:</th>
-                                <td>
-                                    <input name="bw" type="checkbox" id="bw" value="bw">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Duplex:</th>
-                                <td>
-                                    <input name="duplex" type="radio" id="duplex1" checked value="no">
-                                    <label for="duplex1">No</label>
-                                    <br />
-                                    <input name="duplex" type="radio" id="duplex2" value="long">
-                                    <label for="duplex2">Long Edge</label>
-                                    <br />
-                                    <input name="duplex" type="radio" id="duplex3" value="short">
-                                    <label for="duplex3">Short Edge</label>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Copies:</th>
-                                <td>
-                                    <input name="copies" type="number" id="copies" size="2" min="1" max="99" value="1" required>
-                                </td>
-                            </tr>
-                        </table>
-                    </fieldset>
-                    <button type="submit" id="submit" class="button">Submit</button>
-                </form>
-            {{end}}</section>
-            <section id="progress">{{with .Error}}{{.}}{{else}}
-                <span class="loader loader-bars"><span> </span></span>
-                <h3>Calculating Price...</h3> {{end}}
-            </section>
-            <section id="result">
-                <div id="result-content">{{.ResultContent}}</div>
-                <div><a href="/" class="button right">Print another PDF</a></div>
-            </section>
-        </div>
-        <footer><a href="https://stustanet.de/de/impressum/" target="_blank">Imprint</a> | For questions or problems contact <a href="mailto:admins@stusta.de">admins@stusta.de</a></footer>
-        <script type="text/javascript">
-        var errFileType = "Only PDF files are allowed!",
-            errFileSize = "PDF file is too big!";
-        </script>
-        <script src="assets/js/main.js"></script>
-    </body>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Printerinterface | StuStaNet e.V.</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body class="no-js{{with .ResultContent}} result{{else}}{{with .Error}} error{{end}}{{end}}">
+<div id="container">
+  <header class="relative">
+    <a href="/"><h1><img src="/assets/img/logo.png" alt="StuStaNet e.V."/>Print Service</h1></a>
+    <a href="http://drucken.stusta.de" class="language-link">Deutsch</a>
+  </header>
+  {{if .HaspaOpen}}
+    <section id="info" class="info-open">
+      <div>
+        <h1>Collection currently possible in the Hackerspace</h1>
+        <p>
+          The Hackerspace is located on the 3rd floor of house 10.
+        </p>
+        </p>
+      </div>
+    </section>
+  {{end}}
+  <section id="main">{{if .Main}}
+      <aside>
+        <h2>Welcome to the StuStaNet e.V. Printer Webinterface.</h2>
+        <p>Here, you can upload your files and collect them during one of our office hours or in the Hackerspace.
+          The Hackerspace is usually open every day starting at ~19-20h.
+          <br/> The price is shown after the upload.
+          <br/> The document must be a PDF file.
+          <br/> Uncollected print jobs will be automatically deleted after 7 days.</p>
+      </aside>
+      <form id="upload" action="/" method="POST" enctype="multipart/form-data">
+        <fieldset id="step1">
+          <legend>1. Select PDF-File</legend>
+          <div class="info">
+            <a href="https://wiki.stusta.mhn.de/Print#Printing_other_file_types" target="_blank">How can other file
+              types be printed?</a>
+            <br/>
+            <a href="https://wiki.stusta.mhn.de/Print#Print_multiple_pages_on_one_sheet" target="_blank">How can
+              multiple pages be printed on one sheet?</a>
+            <br/>
+          </div>
+          <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="{{.MaxFileSize}}"/>
+          <div id="filedrop">
+            <div id="fileinfo"></div>
+            <p>Drag file here</p>
+            <label for="file">Or click to select a file</label>
+          </div>
+          <input type="file" id="file" name="file" accept=".pdf"/>
+        </fieldset>
+        <fieldset id="step2">
+          <legend>2. Print Options</legend>
+          <table id="settings">
+            <tr>
+              <th>Black/White:</th>
+              <td>
+                <input name="bw" type="checkbox" id="bw" value="bw">
+              </td>
+            </tr>
+            <tr>
+              <th>Duplex:</th>
+              <td>
+                <input name="duplex" type="radio" id="duplex1" checked value="no">
+                <label for="duplex1">No</label>
+                <br/>
+                <input name="duplex" type="radio" id="duplex2" value="long">
+                <label for="duplex2">Long Edge</label>
+                <br/>
+                <input name="duplex" type="radio" id="duplex3" value="short">
+                <label for="duplex3">Short Edge</label>
+              </td>
+            </tr>
+            <tr>
+              <th>Copies:</th>
+              <td>
+                <input name="copies" type="number" id="copies" size="2" min="1" max="99" value="1" required>
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+        <button type="submit" id="submit" class="button">Submit</button>
+      </form>
+      {{end}}</section>
+  <section id="progress">{{with .Error}}{{.}}{{else}}
+      <span class="loader loader-bars"><span> </span></span>
+      <h3>Calculating Price...</h3> {{end}}
+  </section>
+  <section id="result">
+    <div id="result-content">{{.ResultContent}}</div>
+    <div><a href="/" class="button right">Print another PDF</a></div>
+  </section>
+</div>
+<footer><a href="https://stustanet.de/de/impressum/" target="_blank">Imprint</a> | For questions or problems contact <a
+          href="mailto:admins@stusta.de">admins@stusta.de</a></footer>
+<script type="text/javascript">
+  var errFileType = "Only PDF files are allowed!",
+    errFileSize = "PDF file is too big!";
+</script>
+<script src="assets/js/main.js"></script>
+</body>
 </html>
 

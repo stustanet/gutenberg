@@ -93,7 +93,7 @@ func updateHaspaStatus() {
 	// Parse JSON
 	var data struct {
 		State      string `json:"state"`
-		LastUpdate int64  `json:"last_update"`
+		LastUpdate string `json:"last_update"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return

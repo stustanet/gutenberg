@@ -2,55 +2,61 @@
 
 <h3>Dateiinformationen:</h3>
 <table>
-<tr>
-<th>Dateiname:</th>
-<td>{{.Job.Name}}</td>
-</tr>
-<tr>
-<th>Seiten:</th>
-<td>{{.Job.Pages}}</td>
-</tr>
+  <tr>
+    <th>Dateiname:</th>
+    <td>{{.Job.Name}}</td>
+  </tr>
+  <tr>
+    <th>Seiten:</th>
+    <td>{{.Job.Pages}}</td>
+  </tr>
 </table>
 
 <h3>Einstellungen:</h3>
 <table>
-<tr>
-<th>Farbe:</th>
-<td>{{if .Job.BW}}Nein{{else}}Ja{{end}}</td>
-</tr>
-<tr>
-<th>Duplex:</th>
-<td>{{if .Job.Duplex}}{{if eq .Job.Duplex 1}}Lange Kante{{else}}Kurze Kante{{end}}{{else}}Nein{{end}}</td>
-</tr>
-<tr>
-<th>Kopien:</th>
-<td>{{.Job.Copies}}</td>
-</tr>
+  <tr>
+    <th>Farbe:</th>
+    <td>{{if .Job.BW}}Nein{{else}}Ja{{end}}</td>
+  </tr>
+  <tr>
+    <th>Duplex:</th>
+    <td>{{if .Job.Duplex}}{{if eq .Job.Duplex 1}}Lange Kante{{else}}Kurze Kante{{end}}{{else}}Nein{{end}}</td>
+  </tr>
+  <tr>
+    <th>Kopien:</th>
+    <td>{{.Job.Copies}}</td>
+  </tr>
 </table>
 
 <h3>Druckinformationen:</h3>
 <table id="printinfo">
-<!--<tr>
+  <!--<tr>
 <th>Bl&auml;tter:</th>
 <td>{{.Job.Sheets}}</td>
 </tr>-->
-<tr>
-<th>Preis:</th>
-<td class="big">{{printf "%.02f" .Job.Total}} &euro;</td>
-<td rowspan="2"><div class="info">Bitte die PIN notieren!<br />Diese wird zum Drucken ben&ouml;tigt!</div></td>
-</tr>
-<tr>
-<th>PIN:</th>
-<td class="big">{{.Job.PIN}}</td>
-</tr>
+  <tr>
+    <th>Preis:</th>
+    <td class="big">{{printf "%.02f" .Job.Total}} &euro;</td>
+    <td rowspan="2">
+      <div class="info">Bitte die PIN notieren!<br/>Diese wird zum Drucken ben&ouml;tigt!</div>
+    </td>
+  </tr>
+  <tr>
+    <th>PIN:</th>
+    <td class="big">{{.Job.PIN}}</td>
+  </tr>
 </table>
 
 {{with .OfficeHours}}
-<h3>N&auml;chste Sprechstunden</h3>
-<table id="officehours">
-{{range .}}
-<tr><td>{{.WeekDay}},</td><td>{{.Day}}. {{.Month}}</td><td>{{.TimeStart}} - {{.TimeEnd}}</td></tr>
-{{end}}
-</table>
+  <h3>N&auml;chste Sprechstunden</h3>
+  <table id="officehours">
+      {{range .}}
+        <tr>
+          <td>{{.WeekDay}},</td>
+          <td>{{.Day}}. {{.Month}}</td>
+          <td>{{.TimeStart}} - {{.TimeEnd}}</td>
+        </tr>
+      {{end}}
+  </table>
 {{end}}
 
