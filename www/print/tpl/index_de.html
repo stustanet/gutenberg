@@ -16,25 +16,43 @@
     <a href="/"><h1><img src="/assets/img/logo.png" alt="StuStaNet e.V."/>Druckerservice</h1></a>
     <a href="http://print.stusta.de" class="language-link">English</a>
   </header>
-  {{if .HaspaOpen}}
-    <section id="info" class="info-open">
-      <div>
-        <h1>Abholung momentan im Hackerspace möglich</h1>
-        <p>
-          Der Hackerspace befindet sich im 3. Stock in Haus 10.
-        </p>
-        </p>
-      </div>
-    </section>
-  {{end}}
+    {{if .HaspaOpen}}
+      <section id="info" class="info-open">
+        <div>
+          <h1>Abholung momentan im Hackerspace möglich</h1>
+          <p>
+            Der Hackerspace befindet sich im 3. Stock in Haus 10.
+          </p>
+          </p>
+        </div>
+      </section>
+    {{end}}
   <section id="main">{{if .Main}}
       <aside>
         <h2>Willkommen beim StuStaNet e.V. Printer Webinterface.</h2>
-        <p>Hier kannst du deine Dateien hochladen, um sie dann im Sprechstundenraum oder im Hackerspace ausdrucken zu lassen.
-          Der Hackerspace ist meistens täglich ab ca. 19-20h offen.
+        <p>Hier kannst du deine Dateien hochladen, um zum Selbstkostenpreis ausdrucken zu lassen.
           <br/>Nach dem Hochladen wird dir der Preis angezeigt.
           <br/> Das Dokument muss eine PDF Datei sein.
           <br/> Nicht abgeholte Druckauftr&auml;ge werden nach 7 Tagen automatisch gel&ouml;scht.</p>
+      </aside>
+      <aside>
+        <h2>Abholung</h2>
+        <p>Deine hochgeladenen Dateien kannst du dann in einer unserer nächsten Sprechstunden</p>
+          {{with .OfficeHours}}
+            <ul id="officehours" style="margin: 0 0 0 15px;">
+                {{range .}}
+                  <li>
+                    <span>{{.WeekDay}},</span>
+                    <span>{{.Day}}. {{.Month}}</span>
+                    <span>{{.TimeStart}} - {{.TimeEnd}}</span>
+                  </li>
+                {{end}}
+            </ul>
+          {{end}}
+        <p>
+          oder im Hackerspace abholen. Der Hackerspace befindet sich im 3. Stock in Haus 10 und ist meistens
+          täglich ab 19-20 Uhr offen.
+        </p>
       </aside>
       <form id="upload" action="/" method="POST" enctype="multipart/form-data">
         <fieldset id="step1">

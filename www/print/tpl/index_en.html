@@ -30,11 +30,29 @@
   <section id="main">{{if .Main}}
       <aside>
         <h2>Welcome to the StuStaNet e.V. Printer Webinterface.</h2>
-        <p>Here, you can upload your files and collect them during one of our office hours or in the Hackerspace.
-          The Hackerspace is usually open every day starting at ~19-20h.
+        <p>Here, you can upload your files to have them printed at cost price.
           <br/> The price is shown after the upload.
           <br/> The document must be a PDF file.
           <br/> Uncollected print jobs will be automatically deleted after 7 days.</p>
+      </aside>
+      <aside>
+        <h2>Collection</h2>
+        <p>Your uploaded files can be collected in one of our next office hours</p>
+          {{with .OfficeHours}}
+            <ul id="officehours" style="margin: 0 0 0 15px;">
+                {{range .}}
+                  <li>
+                    <span>{{.WeekDay}},</span>
+                    <span>{{.Day}}. {{.Month}}</span>
+                    <span>{{.TimeStart}} - {{.TimeEnd}}</span>
+                  </li>
+                {{end}}
+            </ul>
+          {{end}}
+        <p>
+          or in the Hackerspace. The Hackerspace is located on the third floor of house 10 and is usually open
+          starting at around 7-8pm.
+        </p>
       </aside>
       <form id="upload" action="/" method="POST" enctype="multipart/form-data">
         <fieldset id="step1">

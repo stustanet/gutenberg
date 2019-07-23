@@ -58,7 +58,23 @@ func index(w http.ResponseWriter, r *http.Request) {
 	var haspaOpen bool
 	haspaDone := make(chan bool)
 	go IsHaspaOpen(&haspaOpen, haspaDone)
+
+	// async. get office hours
+	var officeHours []OfficeHour
+	ohDone := make(chan bool)
+	go NextOfficeHours(&officeHours, ohDone)
+
+	<-ohDone
 	<-haspaDone
+
+	// execute tpl
+	type tplOfficeHour struct {
+		WeekDay   string
+		Day       string
+		Month     string
+		TimeStart string
+		TimeEnd   string
+	}
 
 	// config and content for the main template
 	data := struct {
@@ -68,8 +84,71 @@ func index(w http.ResponseWriter, r *http.Request) {
 		HaspaOpen     bool
 		MaxFileSize   uint
 		Error         string
+		OfficeHours   []tplOfficeHour
 		ResultContent template.HTML
-	}{Code: 200, Main: true, MaxFileSize: uint(config.MaxFileSize), HaspaOpen: haspaOpen}
+	}{
+		Code:        200,
+		Main:        true,
+		MaxFileSize: uint(config.MaxFileSize),
+		HaspaOpen:   haspaOpen,
+		OfficeHours: make([]tplOfficeHour, len(officeHours), len(officeHours)),
+	}
+
+	for i, oh := range officeHours {
+		wd := oh.Start.Format("Monday")
+		mo := oh.Start.Format("January")
+
+		if lang == langDE {
+			switch wd {
+			case "Monday":
+				wd = "Montag"
+			case "Tuesday":
+				wd = "Dienstag"
+			case "Wednesday":
+				wd = "Mittwoch"
+			case "Thursday":
+				wd = "Donnerstag"
+			case "Friday":
+				wd = "Freitag"
+			case "Saturday":
+				wd = "Samstag"
+			case "Sunday":
+				wd = "Sonntag"
+			}
+
+			switch mo {
+			case "January":
+				mo = "Januar"
+			case "February":
+				mo = "February"
+			case "March":
+				mo = "M&auml;rz"
+			//case "April":
+			case "May":
+				mo = "Mai"
+			case "June":
+				mo = "Juni"
+			case "July":
+				mo = "Juli"
+				//case "August":
+				//case "September":
+			case "October":
+				mo = "Oktober"
+			//case "November":
+			case "December":
+				mo = "Dezember"
+			}
+
+		}
+
+		data.OfficeHours[i] = tplOfficeHour{
+			WeekDay:   wd,
+			Day:       oh.Start.Format("02"),
+			Month:     mo,
+			TimeStart: oh.Start.Format("15:04"),
+			TimeEnd:   oh.End.Format("15:04"),
+		}
+	}
 
 	// DO NOT CHANGE THE ORDER!
 	// we use fallthrough here!
@@ -213,11 +292,6 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 	file.Close()
 	j.File = f.Name()
 
-	// async. get office hours
-	var officeHours []OfficeHour
-	ohDone := make(chan bool)
-	go NextOfficeHours(&officeHours, ohDone)
-
 	// get basic PDF info
 	if pdfInfo(&j); j.Err != nil {
 		if j.Err == ErrPasswordRequired {
@@ -238,77 +312,10 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 
 	j.Total = j.Price * float64(j.Copies)
 
-	// Wait for office hours goroutine
-	<-ohDone
-
-	// execute tpl
-	type tplOfficeHour struct {
-		WeekDay   string
-		Day       string
-		Month     string
-		TimeStart string
-		TimeEnd   string
-	}
 	type tplData struct {
-		Job         *Job
-		OfficeHours []tplOfficeHour
+		Job *Job
 	}
-	data := tplData{&j, make([]tplOfficeHour, len(officeHours), len(officeHours))}
-	for i, oh := range officeHours {
-		wd := oh.Start.Format("Monday")
-		mo := oh.Start.Format("January")
-
-		if lang == langDE {
-			switch wd {
-			case "Monday":
-				wd = "Montag"
-			case "Tuesday":
-				wd = "Dienstag"
-			case "Wednesday":
-				wd = "Mittwoch"
-			case "Thursday":
-				wd = "Donnerstag"
-			case "Friday":
-				wd = "Freitag"
-			case "Saturday":
-				wd = "Samstag"
-			case "Sunday":
-				wd = "Sonntag"
-			}
-
-			switch mo {
-			case "January":
-				mo = "Januar"
-			case "February":
-				mo = "February"
-			case "March":
-				mo = "M&auml;rz"
-			//case "April":
-			case "May":
-				mo = "Mai"
-			case "June":
-				mo = "Juni"
-			case "July":
-				mo = "Juli"
-				//case "August":
-				//case "September":
-			case "October":
-				mo = "Oktober"
-			//case "November":
-			case "December":
-				mo = "Dezember"
-			}
-
-		}
-
-		data.OfficeHours[i] = tplOfficeHour{
-			WeekDay:   wd,
-			Day:       oh.Start.Format("02"),
-			Month:     mo,
-			TimeStart: oh.Start.Format("15:04"),
-			TimeEnd:   oh.End.Format("15:04"),
-		}
-	}
+	data := tplData{&j}
 
 	switch lang {
 	case langEN:

@@ -109,8 +109,8 @@ func listLog() (logs []Log, err error) {
 
 func getJob(pin string) (*Job, error) {
 	var j Job
-	row := db.QueryRow("SELECT file_id, bw, cyan, magenta, yellow, key, duplex, format, pages, sheets, price, copies, date FROM job WHERE pin = $1", pin)
-	err := row.Scan(&j.File, &j.BW, &j.CMYK.Cyan, &j.CMYK.Magenta, &j.CMYK.Yellow, &j.CMYK.Key, &j.Duplex, &j.Format, &j.Pages, &j.Sheets, &j.Price, &j.Copies, &j.Created)
+	row := db.QueryRow("SELECT pin, file_id, bw, cyan, magenta, yellow, key, duplex, format, pages, sheets, price, copies, date FROM job WHERE pin = $1", pin)
+	err := row.Scan(&j.Pin, &j.File, &j.BW, &j.CMYK.Cyan, &j.CMYK.Magenta, &j.CMYK.Yellow, &j.CMYK.Key, &j.Duplex, &j.Format, &j.Pages, &j.Sheets, &j.Price, &j.Copies, &j.Created)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = errors.New("no job with this ID")
