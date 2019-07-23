@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Print Jobs</title>
-  <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/assets//css/admin.css">
-</head>
-<body>
+{{define "body"}}
 <div class="container-fluid">
   <div id="header" class="row pt-3">
     <div class="col-md-6 col-xs-12">
@@ -41,7 +33,7 @@
         {{range .Jobs}}
           <tr>
             <td>{{.Pin}}</td>
-            <td>{{checkmark .BW}}</td>
+            <td>{{if .BW}}&#x2713;{{else}}&#x2717;{{end}}</td>
             <td>{{.Duplex}}</td>
             <td>{{.Format}}</td>
             <td>{{.Pages}}</td>
@@ -112,9 +104,4 @@
     </div>
   </div>
 </div>
-
-<script src="/assets/jquery/jquery-3.2.1.slim.min.js"></script>
-<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
-<script src="/assets/js/admin.js"></script>
-</body>
-</html>
+{{end}}

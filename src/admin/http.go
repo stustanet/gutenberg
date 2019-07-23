@@ -9,13 +9,14 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"syscall"
 )
 
 var (
-	tmpl   *template.Template
-	config *Config
+	templates map[string]*template.Template
+	config    *Config
 )
 
 func listenSocket() (net.Listener, error) {
@@ -41,7 +42,7 @@ func listenSocket() (net.Listener, error) {
 func detail(w http.ResponseWriter, r *http.Request) {
 	data, err := listJobsDetail()
 
-	err = tmpl.ExecuteTemplate(w, "job_list_detail.html", data)
+	err = renderTemplate(w, "job_list_detail.html", data)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -58,7 +59,7 @@ func jobs(w http.ResponseWriter, r *http.Request) {
 
 	data := Data{jobs, config.Printers, formats}
 
-	err = tmpl.ExecuteTemplate(w, "job_list.html", data)
+	err = renderTemplate(w, "job_list.html", data)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -78,7 +79,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		data.Result = false
 
-		err := tmpl.ExecuteTemplate(w, "job_lookup.html", data)
+		err := renderTemplate(w, "job_lookup.html", data)
 		if err != nil {
 			fmt.Print(err)
 		}
@@ -99,7 +100,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 			data.Printers = config.Printers
 			data.FormatOptions = formats
 
-			err = tmpl.ExecuteTemplate(w, "job_lookup.html", data)
+			err = renderTemplate(w, "job_lookup.html", data)
 			if err != nil {
 				fmt.Print(err)
 			}
@@ -113,7 +114,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 func logs(w http.ResponseWriter, r *http.Request) {
 	data, err := listLog()
 
-	err = tmpl.ExecuteTemplate(w, "log_list.html", data)
+	err = renderTemplate(w, "log_list.html", data)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -171,6 +172,42 @@ func print(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Load templates on program initialisation
+func initTemplates() {
+	templates = make(map[string]*template.Template)
+
+	templatesDir := "tpl/"
+
+	layouts, err := filepath.Glob(templatesDir + "layouts/*.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pages, err := filepath.Glob(templatesDir + "*.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Generate our templates map from our layouts/ and includes/ directories
+	for _, page := range pages {
+		files := append(layouts, page)
+		templates[filepath.Base(page)] = template.Must(template.ParseFiles(files...))
+	}
+
+}
+
+// renderTemplate is a wrapper around template.ExecuteTemplate.
+func renderTemplate(w http.ResponseWriter, name string, data interface{}) error {
+	// Ensure the template exists in the map.
+	tmpl, ok := templates[name]
+	if !ok {
+		return fmt.Errorf("The template %s does not exist.\n", name)
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	return tmpl.ExecuteTemplate(w, "base.html", data)
+}
+
 func main() {
 	noSocket := flag.Bool("no-socket", false, "Do not run as a socket")
 	flag.Parse()
@@ -178,14 +215,7 @@ func main() {
 	//config = getConfig("/etc/ssn/gutenberg/admin-config.json")
 	config, _ = getConfig("../../src/admin/config.json")
 
-	tmpl = template.Must(template.New("main").Funcs(template.FuncMap{
-		"checkmark": func(value bool) template.HTML {
-			if value {
-				return "&#x2713;"
-			}
-			return "&#x2717;"
-		},
-	}).ParseGlob("tpl/*.html"))
+	initTemplates()
 
 	connectDB(config.Dsn)
 	startCleaner(config)

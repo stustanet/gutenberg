@@ -1,16 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Lookup Job</title>
-  <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/assets//css/admin.css">
-</head>
-<body>
+{{define "body"}}
 <div class="container-fluid">
-  <div id="header" class="row pt-3 justify-content-md-center">
-    <h3>StuStaNet Print Admin</h3>
-  </div>
   <div class="row pt-3 justify-content-md-center">
     <div class="col-sm-12 col-md-6 col-lg-4">
       {{if not .Result}}
@@ -85,9 +74,4 @@
     </div>
   </div>
 </div>
-
-<script src="/assets/jquery/jquery-3.2.1.slim.min.js"></script>
-<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
-<script src="/assets/js/admin.js"></script>
-</body>
-</html>
+{{end}}
