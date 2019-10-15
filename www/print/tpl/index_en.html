@@ -16,17 +16,17 @@
     <a href="/"><h1><img src="/assets/img/logo.png" alt="StuStaNet e.V."/>Print Service</h1></a>
     <a href="http://drucken.stusta.de" class="language-link">Deutsch</a>
   </header>
-  {{if .HaspaOpen}}
-    <section id="info" class="info-open">
-      <div>
-        <h1>Collection currently possible in the Hackerspace</h1>
-        <p>
-          The Hackerspace is located on the 3rd floor of house 10.
-        </p>
-        </p>
-      </div>
-    </section>
-  {{end}}
+    {{if .HaspaOpen}}
+      <section id="info" class="info-open">
+        <div>
+          <h1>Collection currently possible in the Hackerspace</h1>
+          <p>
+            The Hackerspace is located on the 3rd floor of house 10.
+          </p>
+          </p>
+        </div>
+      </section>
+    {{end}}
   <section id="main">{{if .Main}}
       <aside>
         <h2>Welcome to the StuStaNet e.V. Printer Webinterface.</h2>
@@ -118,8 +118,8 @@
 <footer><a href="https://stustanet.de/de/impressum/" target="_blank">Imprint</a> | For questions or problems contact <a
           href="mailto:admins@stusta.de">admins@stusta.de</a></footer>
 <script type="text/javascript">
-  var errFileType = "Only PDF files are allowed!",
-    errFileSize = "PDF file is too big!";
+    var errFileType = "Only PDF files are allowed!",
+        errFileSize = "PDF file is too big!";
 </script>
 <script src="assets/js/main.js"></script>
 </body>

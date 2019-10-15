@@ -19,6 +19,7 @@
           <th scope="col">Sheets</th>
           <th scope="col">Price</th>
           <th scope="col">Copies</th>
+          <th scope="col">Total</th>
           <th scope="col">Date</th>
           <th scope="col">Error</th>
         </tr>
@@ -40,6 +41,7 @@
             <td>{{.Sheets}}</td>
             <td>{{printf "%.2f" .Price}}€</td>
             <td>{{.Copies}}</td>
+            <td>{{printf "%.2f" .Total}}€</td>
             <td>{{.Created.Format "2006-01-02 15:04:05" }}</td>
             <td>{{.Err }}</td>
           </tr>
