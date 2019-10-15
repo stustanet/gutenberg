@@ -20,12 +20,15 @@
   </button>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent" style="flex-grow: 0 !important;">
-    <div class="navbar-nav">
+    <div class="navbar-nav mr-auto">
       <a class="nav-item nav-link" href="/">Home</a>
       <a class="nav-item nav-link" href="/jobs">Jobs</a>
       <a class="nav-item nav-link" href="/logs">Logs</a>
       <a class="nav-item nav-link" href="/detail">Detailed Jobs</a>
     </div>
+    <form class="pull-right form-inline ml-5">
+      <input type="text" id="input-search" class="search form-control" placeholder="Search...">
+    </form>
   </div>
 </nav>
 {{template "body" .}}

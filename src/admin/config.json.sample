@@ -4,6 +4,7 @@
       "name": "Hackerspace: Monster",
       "host": "knecht.stusta.de",
       "instance": "monster",
+      "colorBWoption": "Gray",
       "optionsA3": ["InputSlot=PF730B"]
     }
   ],

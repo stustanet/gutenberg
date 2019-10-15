@@ -39,7 +39,7 @@
                 </div>
                 <div class="form-group">
                   <label for="input-disabled-price">Price</label>
-                  <input type="text" class="form-control" id="input-disabled-price" value="{{.Price}}" disabled
+                  <input type="text" class="form-control" id="input-disabled-price" value="{{printf "%.2f" .Price}}€" disabled
                          readonly>
                 </div>
                 {{end}}

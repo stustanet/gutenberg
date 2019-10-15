@@ -90,7 +90,7 @@ legend {
 }
 
 .info-open {
-	background-color: #17a2b8;
+	background-color: #17a2b8b8;
 	color: #fff;
 }
 
@@ -235,6 +235,10 @@ table th {
 
 #progress table {
 	padding-left: 15px;
+}
+
+#main {
+	line-height: 1.5;
 }
 
 .progress #main, .result #main, .error #main {

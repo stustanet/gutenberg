@@ -30,10 +30,10 @@
 
 <h3>Printinfo:</h3>
 <table id="printinfo">
-  <!--<tr>
-<th>Sheets:</th>
-<td>{{.Job.Sheets}}</td>
-</tr>-->
+  <tr>
+    <th>Sheets:</th>
+    <td>{{.Job.Sheets}}</td>
+  </tr>
   <tr>
     <th>Price:</th>
     <td class="big">{{printf "%.02f" .Job.Total}} &euro;</td>
@@ -47,16 +47,16 @@
   </tr>
 </table>
 
-{{with .OfficeHours}}
-  <h3>Next Office Hours</h3>
-  <table id="officehours">
-      {{range .}}
-        <tr>
-          <td>{{.WeekDay}},</td>
-          <td>{{.Day}}. {{.Month}}</td>
-          <td>{{.TimeStart}} - {{.TimeEnd}}</td>
-        </tr>
-      {{end}}
-  </table>
-{{end}}
+{{/*{{with .OfficeHours}}*/}}
+{{/*  <h3>Next Office Hours</h3>*/}}
+{{/*  <table id="officehours">*/}}
+{{/*      {{range .}}*/}}
+{{/*        <tr>*/}}
+{{/*          <td>{{.WeekDay}},</td>*/}}
+{{/*          <td>{{.Day}}. {{.Month}}</td>*/}}
+{{/*          <td>{{.TimeStart}} - {{.TimeEnd}}</td>*/}}
+{{/*        </tr>*/}}
+{{/*      {{end}}*/}}
+{{/*  </table>*/}}
+{{/*{{end}}*/}}
 

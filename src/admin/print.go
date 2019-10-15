@@ -71,7 +71,7 @@ func printJob(w io.Writer, j *Job, printer *Printer, config *Config) (err error)
 	// Color Model
 	color := "ColorModel=CMYK"
 	if j.BW {
-		color = "ColorModel=Gray" // Printer specific!
+		color = "ColorModel=" + printer.ColorBWOption // Printer specific!
 	}
 
 	n := j.Copies

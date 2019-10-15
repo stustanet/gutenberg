@@ -210,10 +210,14 @@ func renderTemplate(w http.ResponseWriter, name string, data interface{}) error 
 
 func main() {
 	noSocket := flag.Bool("no-socket", false, "Do not run as a socket")
+	configFile := flag.String("config", "/etc/ssn/gutenberg/admin-config.json", "Path to config file")
 	flag.Parse()
 
-	//config = getConfig("/etc/ssn/gutenberg/admin-config.json")
-	config, _ = getConfig("../../src/admin/config.json")
+	var err error
+	config, err = getConfig(*configFile)
+	if err != nil {
+		panic(err)
+	}
 
 	initTemplates()
 

@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/julienschmidt/systemd"
 )
@@ -44,6 +45,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(config)
 	lang := langDE
 	switch r.Host {
 	case config.HostEN:
@@ -64,9 +66,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 	ohDone := make(chan bool)
 	go NextOfficeHours(&officeHours, ohDone)
 
-	<-ohDone
-	<-haspaDone
-
 	// execute tpl
 	type tplOfficeHour struct {
 		WeekDay   string
@@ -75,6 +74,9 @@ func index(w http.ResponseWriter, r *http.Request) {
 		TimeStart string
 		TimeEnd   string
 	}
+
+	<-ohDone
+	<-haspaDone
 
 	// config and content for the main template
 	data := struct {
@@ -240,6 +242,7 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 		return http.StatusBadRequest
 	}
 
+	j.Created = time.Now()
 	j.IP = r.RemoteAddr
 	j.BW = (r.FormValue("bw") == "bw")
 	j.Password = r.FormValue("password")
@@ -278,7 +281,7 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 	j.Name = fileheader.Filename
 
 	// save file in upload folder
-	f, err := ioutil.TempFile("upload/", "")
+	f, err := ioutil.TempFile(config.UploadPath, "")
 	if err == nil {
 		err = f.Chmod(0660)
 	}
@@ -336,11 +339,14 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 
 func main() {
 	noSocket := flag.Bool("no-socket", false, "Do not run under a socket.")
+	configFile := flag.String("config", "/etc/ssn/gutenberg/print-config.json", "Path to config file")
 	flag.Parse()
 
-	// TODO: passable config file
-	//config = getConfig("/etc/ssn/gutenberg/admin-config.json")
-	config, _ = getConfig("../../src/print/config.json")
+	var err error
+	config, err = getConfig(*configFile)
+	if err != nil {
+		panic(err)
+	}
 
 	connectDB(config.Dsn)
 

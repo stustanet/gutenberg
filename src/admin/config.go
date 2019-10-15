@@ -15,12 +15,13 @@ type Config struct {
 }
 
 type Printer struct {
-	Name      string   `json:"name"`
-	Host      string   `json:"host"`
-	Instance  string   `json:"instance"`
-	OptionsA5 []string `json:"optionsA5"`
-	OptionsA4 []string `json:"optionsA4"`
-	OptionsA3 []string `json:"optionsA3"`
+	Name          string   `json:"name"`
+	Host          string   `json:"host"`
+	Instance      string   `json:"instance"`
+	ColorBWOption string   `json:"colorBWoption"`
+	OptionsA5     []string `json:"optionsA5"`
+	OptionsA4     []string `json:"optionsA4"`
+	OptionsA3     []string `json:"optionsA3"`
 }
 
 func getConfig(configFile string) (config *Config, err error) {
@@ -31,6 +32,9 @@ func getConfig(configFile string) (config *Config, err error) {
 
 	config = new(Config)
 	err = json.Unmarshal([]byte(file), config)
+	if err != nil {
+		return
+	}
 
 	// correct times such that config.json uses seconds, but go uses nanoseconds
 	config.PruneUploads = config.PruneUploads * int(time.Second)

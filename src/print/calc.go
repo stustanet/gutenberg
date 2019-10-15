@@ -34,6 +34,7 @@ type Job struct {
 	Price    float64       // per copy
 	Total    float64       // total amount
 	Runtime  time.Duration // calculation run time
+	Created  time.Time
 	Err      error
 }
 
@@ -222,100 +223,6 @@ func pdfPkpgcounter(j *Job) {
 		(float64(num) * config.PriceFuser) + // fuser
 		(float64(j.Sheets) * config.PriceSheet) // paper
 	j.Total = j.Price * float64(j.Copies)
-}
-
-/*
-func pdfPrice(job *Job) (err error){
-	var sum Coverage
-	// colorspace arg
-	cs := "-cCMYK"
-	if job.BW {
-		cs = "-sColorConversionStrategy=Gray"
-	}
-
-	// See http://www.guug.de/uptimes/2013-2/uptimes_2013-02.pdf
-	// lower resolution => higher price, faster calculation
-	cmd := exec.Command("gs",
-		"-q",
-		"-o",
-		"-",
-		"-sDEVICE=inkcov",
-		//      "-dProcessColorModel=/DeviceGray",
-		"-r150",
-		"-sPDFPassword="+job.Password,
-		job.File,
-	)
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return
-	}
-	if err = cmd.Start(); err != nil {
-		return
-	}
-	num := 0
-	rdr := bufio.NewReader(stdout)
-	for {
-		var line []byte
-		line, _, err = rdr.ReadLine()
-		if err != nil {
-			if err != io.EOF {
-				return
-			}
-			break
-		}
-		num++
-
-		var c Coverage
-		if c, err = inkCover(line); err != nil {
-			return
-		}
-
-		sum.Cyan += c.Cyan / float64(job.Pages)
-		sum.Magenta += c.Magenta / float64(job.Pages)
-		sum.Yellow += c.Yellow / float64(job.Pages)
-		sum.Key += c.Key / float64(job.Pages)
-	}
-	if err = cmd.Wait(); err != nil {
-		return
-	}
-
-	job.CMYK = sum
-
-	j.Price = sum.Price() + // ink
-		(float64(num) * config.PriceFuser) + // fuser
-		(float64(j.Sheets) * config.PriceSheet) // paper
-	j.Total = j.Price * float64(j.Copies)
-
-	return
-}*/
-
-func inkCover(line []byte) (c Coverage, err error) {
-	// Format: " 0.00000  0.00000  0.00000  0.02231 CMYK OK"
-	if len(line) == 43 && bytes.Compare(line[35:], []byte(" CMYK OK")) == 0 {
-		c.Cyan, err = strconv.ParseFloat(string(line[1:8]), 64)
-		c.Cyan *= 100
-		if err != nil {
-			return
-		}
-
-		c.Magenta, err = strconv.ParseFloat(string(line[10:17]), 64)
-		c.Magenta *= 100
-		if err != nil {
-			return
-		}
-
-		c.Yellow, err = strconv.ParseFloat(string(line[19:26]), 64)
-		c.Yellow *= 100
-		if err != nil {
-			return
-		}
-
-		c.Key, err = strconv.ParseFloat(string(line[28:35]), 64)
-		c.Key *= 100
-		return
-	}
-
-	return c, ErrInvalidFormat
 }
 
 func inkCoverBW(line string) (c Coverage, err error) {

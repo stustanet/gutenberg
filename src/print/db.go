@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"math/rand"
 	"strings"
@@ -46,11 +47,16 @@ func saveJob(j *Job) (err error) {
 		if j.Err != nil {
 			error = j.Err.Error()
 		}
+		filename := strings.Split(j.File, "/")
+
 		_, err = db.Exec(
-			"INSERT INTO job (file_id, pin, ip_address, bw, cyan, magenta, yellow, key, duplex, format, pages, sheets, price, copies, error) "+
-				"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
-			j.File[7:], j.PIN, j.IP, j.BW, j.CMYK.Cyan, j.CMYK.Magenta, j.CMYK.Yellow, j.CMYK.Key, duplex, j.Format, j.Pages, j.Sheets, j.Price, j.Copies, error,
+			"INSERT INTO job (file_id, pin, ip_address, bw, cyan, magenta, yellow, key, duplex, format, pages, sheets, price, copies, date, error) "+
+				"VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
+			filename[len(filename)-1], j.PIN, j.IP, j.BW, j.CMYK.Cyan, j.CMYK.Magenta, j.CMYK.Yellow, j.CMYK.Key, duplex, j.Format, j.Pages, j.Sheets, j.Price, j.Copies, j.Created, error,
 		)
+		if err != nil {
+			fmt.Println("Save Job error:", err.Error())
+		}
 		if err == nil || !strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 			return
 		}
