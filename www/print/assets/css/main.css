@@ -3,7 +3,7 @@ body, html {
 	height: 100%;
 	width: 100%;
 	font-family: "Helvetica Neue", Helvetica, freesans, sans-serif;
-	background-color: #FFF;	
+	background-color: #FFF;
 }
 
 #container {
@@ -32,7 +32,7 @@ header {
 
 header a {
 	color: #666;
-	text-decoration: none !important; 
+	text-decoration: none !important;
 }
 
 header a:hover h1, header a:active h1 {
@@ -55,6 +55,7 @@ header h1 {
 
 aside {
 	margin: 20px 0 30px;
+    padding: 5px;
 	background: #F5F5F5;
 }
 
@@ -89,6 +90,10 @@ legend {
 #info h1 {
 	padding-top: 5px;
 	margin: 0;
+}
+
+#info p {
+    padding-bottom: 5px;
 }
 
 .info-open {
@@ -258,6 +263,7 @@ table th {
 
 footer {
 	border-top: 2px solid #EEE;
+    padding: 5px;
 	height: 50px;
 	color: #666;
 	text-align: center;
