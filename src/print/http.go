@@ -45,7 +45,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(config)
 	lang := langDE
 	switch r.Host {
 	case config.HostEN:
