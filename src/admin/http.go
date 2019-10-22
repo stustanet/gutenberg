@@ -26,7 +26,7 @@ func listenSocket() (net.Listener, error) {
 	}
 
 	if pid != os.Getpid() {
-		return nil, errors.New("Listen PID does not match")
+		return nil, errors.New("Listen PID does not match.")
 	}
 
 	if os.Getenv("LISTEN_FDS") != "1" {
@@ -40,7 +40,14 @@ func listenSocket() (net.Listener, error) {
 }
 
 func detail(w http.ResponseWriter, r *http.Request) {
-	data, err := listJobsDetail()
+	jobs, err := listJobsDetail()
+
+	type Data struct {
+		WithSearch bool
+		Jobs       []Job
+	}
+
+	data := Data{true, jobs}
 
 	err = renderTemplate(w, "job_list_detail.html", data)
 	if err != nil {
@@ -52,12 +59,13 @@ func jobs(w http.ResponseWriter, r *http.Request) {
 	jobs, err := listJobs()
 
 	type Data struct {
+		WithSearch    bool
 		Jobs          []Job
 		Printers      []Printer
 		FormatOptions []string
 	}
 
-	data := Data{jobs, config.Printers, formats}
+	data := Data{true, jobs, config.Printers, formats}
 
 	err = renderTemplate(w, "job_list.html", data)
 	if err != nil {
@@ -67,6 +75,7 @@ func jobs(w http.ResponseWriter, r *http.Request) {
 
 func index(w http.ResponseWriter, r *http.Request) {
 	type Data struct {
+		WithSearch    bool
 		Job           Job
 		Printers      []Printer
 		FormatOptions []string
@@ -75,6 +84,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := Data{}
+	data.WithSearch = false
 
 	if r.Method == "GET" {
 		data.Result = false
@@ -112,7 +122,14 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func logs(w http.ResponseWriter, r *http.Request) {
-	data, err := listLog()
+	logs, err := listLog()
+
+	type Data struct {
+		WithSearch bool
+		Logs       []Log
+	}
+
+	data := Data{true, logs}
 
 	err = renderTemplate(w, "log_list.html", data)
 	if err != nil {

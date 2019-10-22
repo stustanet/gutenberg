@@ -26,9 +26,12 @@
       <a class="nav-item nav-link" href="/logs">Logs</a>
       <a class="nav-item nav-link" href="/detail">Detailed Jobs</a>
     </div>
+
+    {{if .WithSearch}}
     <form class="pull-right form-inline ml-5">
       <input type="text" id="input-search" class="search form-control" placeholder="Search...">
     </form>
+    {{end }}
   </div>
 </nav>
 {{template "body" .}}

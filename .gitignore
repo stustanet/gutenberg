@@ -3,4 +3,4 @@ www/print/.*
 www/print/upload/
 src/admin/config.json
 src/print/config.json
-
+/.idea

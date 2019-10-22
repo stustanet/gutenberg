@@ -9,7 +9,7 @@ $(document).ready(function(){
 
 function openModal(pin, price, format) {
   $("#input-disabled-pin").val(pin);
-  $("#input-disabled-price").val(price + "€");
+  $("#input-disabled-price").val(parseFloat(price).toFixed(2) + "€");
   $("#input-format").val(format);
 
   $('#modal-print').modal('show');
