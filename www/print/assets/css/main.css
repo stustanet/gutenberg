@@ -8,7 +8,7 @@ body, html {
 
 #container {
 	min-height: 100%;
-	margin-bottom: -52px;
+	margin-bottom: -57px;
 }
 
 #container:after {
@@ -263,7 +263,7 @@ table th {
 
 footer {
 	border-top: 2px solid #EEE;
-    padding: 5px;
+    padding-top: 5px;
 	height: 50px;
 	color: #666;
 	text-align: center;
