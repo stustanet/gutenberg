@@ -161,17 +161,18 @@ func print(w http.ResponseWriter, r *http.Request) {
 	if format == formatA5 || format == formatA4 || format == formatA3 {
 		job.Format = format
 	} else {
-		http.Error(w, "Invalid FOrmat", http.StatusBadRequest)
+		http.Error(w, "Invalid Format", http.StatusBadRequest)
 		return
 	}
 
 	printerName := r.FormValue("printer")
 	var printer *Printer
 	validPrinter := false
-	for _, p := range config.Printers {
-		if p.Name == printerName {
+	for i := range config.Printers {
+		if config.Printers[i].Name == printerName {
 			validPrinter = true
-			printer = &p
+			printer = &config.Printers[i]
+			break
 		}
 	}
 
