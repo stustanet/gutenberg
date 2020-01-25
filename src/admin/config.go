@@ -12,6 +12,7 @@ type Config struct {
 	PruneUploads int       `json:"pruneUploads"`
 	Dsn          string    `json:"dsn"`
 	Printers     []Printer `json:"printers"`
+	AllowedIPs   []string  `json:"allowedIPs"`
 }
 
 type Printer struct {

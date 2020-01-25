@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"syscall"
 )
 
@@ -39,7 +40,21 @@ func listenSocket() (net.Listener, error) {
 	return net.FileListener(os.NewFile(fd, ""))
 }
 
+func isAllowedIP(w http.ResponseWriter, r *http.Request) bool {
+	for _, ip := range config.AllowedIPs {
+		if ip == strings.Split(r.RemoteAddr, ":")[0] {
+			return true
+		}
+	}
+
+	http.Error(w, "Job PIN missing", http.StatusForbidden)
+	return false
+}
+
 func detail(w http.ResponseWriter, r *http.Request) {
+	if !isAllowedIP(w, r) {
+		return
+	}
 	jobs, err := listJobsDetail()
 
 	type Data struct {
@@ -56,6 +71,9 @@ func detail(w http.ResponseWriter, r *http.Request) {
 }
 
 func jobs(w http.ResponseWriter, r *http.Request) {
+	if !isAllowedIP(w, r) {
+		return
+	}
 	jobs, err := listJobs()
 
 	type Data struct {
@@ -122,6 +140,9 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func logs(w http.ResponseWriter, r *http.Request) {
+	if !isAllowedIP(w, r) {
+		return
+	}
 	logs, err := listLog()
 
 	type Data struct {

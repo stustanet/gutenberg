@@ -117,6 +117,7 @@ func getJob(pin string) (*Job, error) {
 		}
 		return nil, err
 	}
+	j.Total = j.Price * float64(j.Copies)
 
 	return &j, nil
 }

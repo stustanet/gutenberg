@@ -30,11 +30,11 @@
             <td>{{.Sheets}}</td>
             <td>{{printf "%.2f" .Price}}€</td>
             <td>{{.Copies}}</td>
-            <td>{{printf "%.2f" .Total}}</td>
+            <td>{{printf "%.2f" .Total}}€</td>
             <td>{{.Created.Format "2006-01-02 15:04:05" }}</td>
             <td>{{.Err }}</td>
             <td>
-              <button class="btn btn-outline-success" onclick="openModal('{{.Pin}}', '{{.Price}}', '{{.Format}}')">
+              <button class="btn btn-outline-success" onclick="openModal('{{.Pin}}', '{{.Total}}', '{{.Format}}')">
                 <img src="/assets/img/print.png" alt="Print"/>
               </button>
             </td>
