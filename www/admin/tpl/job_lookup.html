@@ -3,6 +3,11 @@
   <div class="row pt-3 justify-content-md-center">
     <div class="col-sm-12 col-md-6 col-lg-4">
       {{if not .Result}}
+          {{if .Err}}
+            <div class="alert alert-danger" role="alert">
+                {{.Err}}
+            </div>
+          {{end}}
         <div class="card">
           <div class="card-header">
             <h5 class="card-title">Print File</h5>
@@ -24,7 +29,7 @@
           <div class="alert alert-danger" role="alert">
               {{.Err}}
           </div>
-        {{else}}
+        {{end}}
           <div class="card">
             <div class="card-header">
               <h5 class="card-title">Print File</h5>
@@ -74,4 +79,3 @@
     </div>
   </div>
 </div>
-{{end}}

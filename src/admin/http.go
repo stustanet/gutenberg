@@ -112,7 +112,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 			fmt.Print(err)
 		}
 	} else if r.Method == "POST" {
-		data.Result = true
 		pin := r.FormValue("pin")
 		if len(pin) < 1 {
 			http.Error(w, "Job PIN missing", http.StatusBadRequest)
@@ -121,8 +120,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 		job, err := getJob(pin)
 		if err != nil {
-			err = errors.New("Job not found for PIN " + pin)
+			data.Err = errors.New("Job not found for PIN " + pin)
+			err = renderTemplate(w, "job_lookup.html", data)
 		} else {
+			data.Result = true
 			data.Job = *job
 			fmt.Println(job.Pin, job.Price)
 			data.Printers = config.Printers
