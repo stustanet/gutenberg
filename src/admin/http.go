@@ -47,7 +47,7 @@ func isAllowedIP(w http.ResponseWriter, r *http.Request) bool {
 		}
 	}
 
-	http.Error(w, "Job PIN missing", http.StatusForbidden)
+	http.Error(w, "Permission Denied - Untrusted Host", http.StatusForbidden)
 	return false
 }
 
