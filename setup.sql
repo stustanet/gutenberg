@@ -23,6 +23,7 @@ CREATE TABLE if not exists job (
         sheets SMALLINT NOT NULL,
         price DOUBLE PRECISION NOT NULL,
         copies SMALLINT DEFAULT 1,
+        rotated boolean DEFAULT false,
         date TIMESTAMP WITH TIME ZONE DEFAULT statement_timestamp(),
         error TEXT
 );

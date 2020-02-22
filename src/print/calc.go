@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -31,6 +32,7 @@ type Job struct {
 	Pages    int
 	Sheets   int
 	Copies   int
+	Rotated  bool
 	Price    float64       // per copy
 	Total    float64       // total amount
 	Runtime  time.Duration // calculation run time
@@ -65,6 +67,8 @@ func (c *Coverage) Print(w io.Writer, page int) {
 var (
 	ErrInvalidFormat    = errors.New("invalid format")
 	ErrPasswordRequired = errors.New("password required")
+	ErrInvalidPdfinfo   = errors.New("invalid pdf info output")
+	pageSizeRegex       = regexp.MustCompile(`^Page size:\s+(?P<width>\d+\.?\d*) x (?P<height>\d+\.?\d*) pts \((?P<format>\w+)\).*$`)
 )
 
 func pdfInfo(j *Job) {
@@ -115,11 +119,26 @@ func pdfInfo(j *Job) {
 		      info.title = string(line[16:])
 		  }*/
 		case 'P':
-			if bytes.Compare(line[:6], []byte("Pages:")) == 0 {
+			if bytes.HasPrefix(line, []byte("Pages:")) {
 				j.Pages, j.Err = strconv.Atoi(string(line[16:]))
 				if j.Err != nil {
 					return
 				}
+			} else if bytes.HasPrefix(line, []byte("Page size:")) {
+				var match = pageSizeRegex.FindStringSubmatch(string(line))
+				if len(match) == 0 {
+					j.Err = ErrInvalidPdfinfo
+					return
+				}
+				var width, _ = strconv.ParseFloat(match[1], 32)
+				var height, _ = strconv.ParseFloat(match[2], 32)
+				var widthToHeight = width / height
+
+				if widthToHeight > 1.0 {
+					j.Rotated = true
+				}
+
+				j.Format = match[3]
 			}
 			/*case 'E':
 			  if bytes.Compare(line[:10], []byte("Encrypted:")) == 0 {

@@ -28,6 +28,7 @@ type Job struct {
 	Copies   int
 	Price    float64 // per copy
 	Total    float64 // total amount
+	Rotated  bool
 	Created  time.Time
 	Printed  time.Time
 	Err      error
@@ -104,6 +105,10 @@ func printJob(w io.Writer, j *Job, printer *Printer, config *Config) (err error)
 	default:
 		err = errors.New("invalid format specified")
 		return
+	}
+
+	if j.Rotated {
+		args = append(args, "-o orientation-requested=5")
 	}
 
 	args = append(args, config.UploadPath+j.File)
