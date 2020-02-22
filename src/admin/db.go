@@ -23,7 +23,7 @@ func connectDB(dsn string) {
 }
 
 func listJobs() (jobs []Job, err error) {
-	rows, err := db.Query("SELECT pin, bw, duplex, format, pages, sheets, price, copies, date, error FROM job ORDER BY id DESC")
+	rows, err := db.Query("SELECT pin, bw, duplex, format, pages, sheets, price, copies, rotated, date, error FROM job ORDER BY id DESC")
 	if err != nil {
 		return
 	}
@@ -33,7 +33,7 @@ func listJobs() (jobs []Job, err error) {
 	defer rows.Close()
 	var error sql.NullString
 	for rows.Next() {
-		err = rows.Scan(&job.Pin, &job.BW, &job.Duplex, &job.Format, &job.Pages, &job.Sheets, &job.Price, &job.Copies, &job.Created, &error)
+		err = rows.Scan(&job.Pin, &job.BW, &job.Duplex, &job.Format, &job.Pages, &job.Sheets, &job.Price, &job.Copies, &job.Rotated, &job.Created, &error)
 		if err != nil {
 			return
 		}
@@ -51,7 +51,7 @@ func listJobs() (jobs []Job, err error) {
 }
 
 func listJobsDetail() (jobs []Job, err error) {
-	rows, err := db.Query("SELECT pin, file_id, ip_address, bw, cyan, magenta, yellow, key, duplex, format, pages, sheets, price, copies, date, error FROM job ORDER BY id DESC")
+	rows, err := db.Query("SELECT pin, file_id, ip_address, bw, cyan, magenta, yellow, key, duplex, format, pages, sheets, price, copies, rotated, date, error FROM job ORDER BY id DESC")
 	if err != nil {
 		return
 	}
@@ -61,7 +61,7 @@ func listJobsDetail() (jobs []Job, err error) {
 	defer rows.Close()
 	var error sql.NullString
 	for rows.Next() {
-		err = rows.Scan(&job.Pin, &job.File, &job.Ip, &job.BW, &job.CMYK.Cyan, &job.CMYK.Magenta, &job.CMYK.Yellow, &job.CMYK.Key, &job.Duplex, &job.Format, &job.Pages, &job.Sheets, &job.Price, &job.Copies, &job.Created, &error)
+		err = rows.Scan(&job.Pin, &job.File, &job.Ip, &job.BW, &job.CMYK.Cyan, &job.CMYK.Magenta, &job.CMYK.Yellow, &job.CMYK.Key, &job.Duplex, &job.Format, &job.Pages, &job.Sheets, &job.Price, &job.Copies, &job.Rotated, &job.Created, &error)
 		if err != nil {
 			return
 		}
@@ -109,8 +109,8 @@ func listLog() (logs []Log, err error) {
 
 func getJob(pin string) (*Job, error) {
 	var j Job
-	row := db.QueryRow("SELECT pin, file_id, bw, cyan, magenta, yellow, key, duplex, format, pages, sheets, price, copies, date FROM job WHERE pin = $1", pin)
-	err := row.Scan(&j.Pin, &j.File, &j.BW, &j.CMYK.Cyan, &j.CMYK.Magenta, &j.CMYK.Yellow, &j.CMYK.Key, &j.Duplex, &j.Format, &j.Pages, &j.Sheets, &j.Price, &j.Copies, &j.Created)
+	row := db.QueryRow("SELECT pin, file_id, bw, cyan, magenta, yellow, key, duplex, format, pages, sheets, price, rotated, copies, date FROM job WHERE pin = $1", pin)
+	err := row.Scan(&j.Pin, &j.File, &j.BW, &j.CMYK.Cyan, &j.CMYK.Magenta, &j.CMYK.Yellow, &j.CMYK.Key, &j.Duplex, &j.Format, &j.Pages, &j.Sheets, &j.Price, &j.Rotated, &j.Copies, &j.Created)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			err = errors.New("no job with this ID")
