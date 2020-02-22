@@ -68,7 +68,7 @@ var (
 	ErrInvalidFormat    = errors.New("invalid format")
 	ErrPasswordRequired = errors.New("password required")
 	ErrInvalidPdfinfo   = errors.New("invalid pdf info output")
-	pageSizeRegex       = regexp.MustCompile(`^Page size:\s+(?P<width>\d+\.?\d*) x (?P<height>\d+\.?\d*) pts( \((?P<format>\w+)\))?.*$`)
+	pageSizeRegex       = regexp.MustCompile(`^Page size:\s+(?P<width>\d+\.?\d*) x (?P<height>\d+\.?\d*) pts(?: \((?P<format>\w+)\))?.*$`)
 )
 
 func pdfInfo(j *Job) {
