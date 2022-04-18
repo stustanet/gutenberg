@@ -303,7 +303,7 @@ func upload(w http.ResponseWriter, r *http.Request, lang int) int {
 
 	} else {
 		// calculate price
-		pdfPkpgcounter(&j)
+        calcCost(&j)
 	}
 
 	// save print job to DB

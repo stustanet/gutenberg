@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+    "os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -182,6 +183,98 @@ func pdfInfo(j *Job) {
 	return
 }
 
+func calcCost(j *Job) {
+    if j.BW {
+        err := convertGray(j.File, j.Password)
+
+        if err != nil {
+            j.Err = err
+            return
+        }
+        os.Rename(j.File+"_gray.pdf", j.File)
+    }
+    ghostscript_ink_cov(j)
+    
+
+	j.Price = j.CMYK.Price() + // ink
+		(float64(j.Pages) * config.PriceFuser) + // fuser
+		(float64(j.Sheets) * config.PriceSheet) // paper
+	j.Total = j.Price * float64(j.Copies)
+
+}
+
+func ghostscript_ink_cov(j *Job) {
+    cmd := exec.Command("gs",
+                        "-dSAFER",
+                        "-dNOPAUSE",
+                        "-dBATCH",
+                        "-d",
+                        "-q",
+                        "-o-",
+                        "-sDEVICE=ink_cov",
+                //      "-sPDFPassword="+password,
+                        j.File)
+    start := time.Now()
+    out, err := cmd.Output()
+    if err != nil {
+        j.Err = err
+        return
+    }
+    
+    num := 0
+
+    var sum Coverage
+    scanner := bufio.NewScanner(strings.NewReader(string(out)))
+    for scanner.Scan() {
+        var pageCov Coverage
+        // Format: 1.000000 1.000000 1.000000 1.000000 CMYK OK
+        line := scanner.Text()
+        num++
+        tokens := strings.Fields(line)
+
+        pageCov.Cyan, err = strconv.ParseFloat(tokens[0], 64)
+        if err != nil {
+            j.Err = err
+            return
+        }
+
+        pageCov.Magenta, err = strconv.ParseFloat(tokens[1], 64)
+        if err != nil {
+            j.Err = err
+            return
+        }
+        
+        pageCov.Yellow, err = strconv.ParseFloat(tokens[2], 64)
+        if err != nil {
+            j.Err = err
+            return
+        }
+        
+        pageCov.Key, err = strconv.ParseFloat(tokens[3], 64)
+        if err != nil {
+            j.Err = err
+            return
+        }
+        
+        sum.Cyan += pageCov.Cyan
+        sum.Magenta += pageCov.Magenta
+        sum.Yellow += pageCov.Yellow
+        sum.Key += pageCov.Key
+            // TODO: WEITERMACHEN
+    }
+
+    j.CMYK = sum
+    j.Runtime = time.Since(start)
+
+    
+	if j.Duplex == simplex {
+		j.Sheets = num
+	} else {
+		j.Sheets = (num + 1) / 2
+	}
+
+}
+
 func pdfPkpgcounter(j *Job) {
 	// colorspace arg
 	cs := "-cCMYK"
@@ -193,8 +286,8 @@ func pdfPkpgcounter(j *Job) {
 	cmd := exec.Command("pkpgcounter",
 		cs,
 		//      "-r150",
-		j.File,
-	)
+		j.File)
+
 	out, err := cmd.Output()
 	if err != nil {
 		j.Err = err
@@ -296,11 +389,10 @@ func inkCoverCMYK(line string) (c Coverage, err error) {
 	return c, ErrInvalidFormat
 }
 
-func convertGray(w io.Writer, filename, password string) error {
-	start := time.Now()
+func convertGray(filename, password string) error {
 	err := exec.Command("gs",
 		"-q",
-		"-sOutputFile=output.pdf", // TODO: output name
+		"-sOutputFile="+filename+"_gray.pdf", // TODO: output name
 		"-sDEVICE=pdfwrite",
 		"-dNumRenderingThreads=2",
 		//      "-sPAPERSIZE=a4",
@@ -323,7 +415,5 @@ func convertGray(w io.Writer, filename, password string) error {
 		filename,
 	).Run()
 
-	elapsed := time.Since(start)
-	fmt.Fprintf(w, "Time elapsed: %s \n", elapsed)
 	return err
 }
